@@ -29,8 +29,8 @@ export const TapResult = (props) => {
     useEffect(() => {
         navigation.setOptions({
             headerRight: () => (<View style={{flexDirection:"row"}}>
-                <Button onPress={toggleZones} title = {BTitle} color = "#f11e"></Button>
-                <Button onPress={toggleModal} title = "LEGEND" color = "#f11e"></Button>
+                <Button onPress={toggleZones} title = {BTitle}></Button>
+                <Button onPress={toggleModal} title = "LEGEND"></Button>
                 </View>)
         })
      }, [isZoneVisible])
@@ -60,7 +60,7 @@ export const TapResult = (props) => {
                     <Text>{datum.timeTaken}s</Text>
                 </TouchableOpacity>
             ))}
-            <Modal isVisible={isModalVisible} backdropColor="white" backdropOpacity={1} onBackButtonPress = {toggleModal} onBackdropPress = {toggleModal}>
+            <Modal isVisible={isModalVisible}  hideModalContentWhileAnimating={true} useNativeDriver={true} animationIn="fadeIn" backdropTransitionInTiming={0} backdropColor="white" backdropOpacity={1} onBackButtonPress = {toggleModal} onBackdropPress = {toggleModal}>
                 <View style={{ justifyContent: "center", alignItems: "center", flexDirection: "row"}}>
                     <TouchableOpacity style={{...styles.legendButton, backgroundColor:"red"}}>
                     </TouchableOpacity>

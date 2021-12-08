@@ -5,6 +5,7 @@ import {Database} from "../Database"
 
 const db = new Database("result.db");
 let tid = 0;
+let timer
 
 export const ExpButton = (props) => {
     const navigation = useNavigation();
@@ -12,6 +13,7 @@ export const ExpButton = (props) => {
     const [xPos, setXPos] = useState([])
     let prod = route.params.product
     let dev = route.params.device
+    let pid = route.params.PID
 
     //function to run onMount
     useEffect(() => {
@@ -25,7 +27,7 @@ export const ExpButton = (props) => {
         //function to write testid data to db
         async function writeData() {
             console.log(typeof prod)
-            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType) values (?, ?, ?, ?)", [dev,prod,false,"tapping"])
+            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid) values (?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid])
             tid = res1.insertId
             console.log(res1)
         }
@@ -40,12 +42,20 @@ export const ExpButton = (props) => {
         return setXPos([...data , ...data]);
     },[])
 
+    //cleanup to clear timeouts on component unmount
+    useEffect(() => {
+        return () => {
+            clearTimeout(timer);
+          };
+    },[])
+
     const [position, setPosition] = useState(0)
     const [startTime, setStartTime] = useState(new Date() * 1)
     const [backColor, setBackColor] = useState("orange")
     //function to handle correct button press
     let changePosition = arg1 => async () => {
-
+        console.log(xPos.length)
+        console.log("Hello")
         let elapsedTime = (new Date() * 1) - startTime
         if(arg1 == 0){ //on accurate press condition
             //insert data to result table
@@ -68,7 +78,7 @@ export const ExpButton = (props) => {
                 { name: 'Home' },
                 {
                     name: 'resultPage',
-                    params:  {tid: tid, device: dev, product: prod}
+                    params:  {tid: tid, device: dev, product: prod, pid:pid}
                 },
                 ],
             })
@@ -76,12 +86,12 @@ export const ExpButton = (props) => {
         }else{
             if(arg1 == 1){
                 setBackColor("#ff0000")
-                setTimeout(function(){
+                timer = setTimeout(function(){
                     setBackColor("orange")
                 }, 100);
             }else{
                 setBackColor("#00ff00")
-                setTimeout(function(){
+                timer = setTimeout(function(){
                     setBackColor("orange")
                 }, 100);
             }
@@ -92,7 +102,8 @@ export const ExpButton = (props) => {
     }
 
     return (
-        <View style={{...styles.container}}>
+
+         <View style={{...styles.container}}>
             <TouchableWithoutFeedback onPress = {changePosition(1)}>
             <View style={styles.container}/>
             </TouchableWithoutFeedback>
@@ -100,6 +111,7 @@ export const ExpButton = (props) => {
                 <Text>{xPos.length}</Text>
             </TouchableOpacity>
         </View>
+
     )
   }
 

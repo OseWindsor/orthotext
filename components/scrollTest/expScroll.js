@@ -14,36 +14,70 @@ LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
 
 export const ExpScroll = (props) => {
     const navigation = useNavigation();
+    const route = useRoute();
     const posi = JSON.parse(JSON.stringify(positionsData));
     const swipeComp = useRef(null)
     const [upd, setUpd] = useState(0)
     const [startTime, setStartTime] = useState(new Date() * 1)
+    const [trials, setTrials] = useState(0)
     const scrollWidth = Dimensions.get('window').width
     var btnSize = Dimensions.get('window').width*0.2
     const [positionArray, setPositionArray] = useState(posi)
+    let prod = route.params.product
+    let dev = route.params.device
+    let pid = route.params.PID
+
+    //create entry in swipe test summary table at start
+    useEffect(() => {
+        //function to write testid data to db
+        async function writeData() {
+            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid) values (?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid])
+            tid = res1.insertId
+        }
+        writeData()
+        console.log(pid)
+        },[])
 
     //function to execute on successful scroll
-    function handleVerify(){
+    async function handleVerify(){
+        //calculate time to scroll
+        let timeElapsed = ((new Date() * 1) - startTime)/1000
+        await db.execute("insert into scrollResult (tid, xPos, yPos, alignment, trials, timeTaken) values (?,?,?,?,?,?)",[tid, positionArray[upd].left, positionArray[upd].bottom, positionArray[upd].alignment, trials, timeElapsed])    
         positionArray.splice(upd,1)
-        setPositionArray([...positionArray])
-        swipeComp.current.reset()
-        console.log(positionArray.length)
         if(positionArray.length==0){
-            navigation.navigate("Home")
+            await db.execute("update summary set testStatus = ? where id = ?", [true, tid])
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [
+                    { name: 'Home' },
+                    {
+                        name: 'scrollResultPage',
+                        params:  {tid: tid, device: dev, product: prod, pid: pid}
+                    },
+                    ],
+                })
+                );
+        }else{
+            let randIndex = Math.floor(Math.random() * positionArray.length)
+            setUpd(randIndex)
+            setPositionArray([...positionArray])
+            swipeComp.current.reset()
+            setTrials(0)
         }
-        let randIndex = Math.floor(Math.random() * positionArray.length)
-        setUpd(randIndex)
     }
 
     //set btnSize on position update
     useEffect(() => {
-        console.log('res')
         btnSize = positionArray[upd].alignment == 90 || positionArray[upd].alignment == 270?Dimensions.get('window').width*0.2:Dimensions.get('window').height*0.1
     }, [upd,positionArray])
 
     //on start scroll, start timing
     function handleStart(){
-        setStartTime(new Date() * 1)
+        if(trials == 0){
+            setStartTime(new Date() * 1)
+        }
+        setTrials(trials+1)
     }
 
     return (
