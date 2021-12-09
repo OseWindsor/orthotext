@@ -44,11 +44,9 @@ export const ParticipantDrop = ({onUpdate }) => {
         items={participants}
         setOpen={setParticipantOpen}
         setValue={setParticipantValue}
-        showArrowIcon={false}
-        showTickIcon={false}
         setItems={setParticipants}
-        labelStyle = {{textAlign: 'center', fontSize:18}}
-        textStyle = {{textAlign: 'center', fontSize:18}}
+        labelStyle = {{textAlign: 'left', fontSize:18}}
+        textStyle = {{textAlign: 'left', fontSize:18}}
       />
     )
 }

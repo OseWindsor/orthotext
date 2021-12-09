@@ -37,6 +37,7 @@ return <View style={{padding: 10, borderWidth: 1, marginTop: 15, borderRadius: 1
 }
 
 export const resultSelect = (props) => {
+    const navigation = useNavigation()
     const [btnStatus, setBtnStatus] = useState(true)
     const [countLoop, setCountLoop] = useState([])
     const [open, setOpen] = useState(false);
@@ -80,8 +81,9 @@ export const resultSelect = (props) => {
     
   
     return (
-      <View style = {{flex:1, padding: 15, marginHorizontal: 15, alignItems: 'center', zIndex: 10, position: 'relative'}}>
-        <Text style = {{marginBottom: 15}}>Select Test:</Text>
+      <View style = {{flex:1, padding: 10, alignItems: 'center', zIndex: 10, position: 'relative', paddingHorizontal:20}}>
+        <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:25, fontWeight:"bold", marginTop:15}}>View Results</Text>
+        <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:16}}>Select Test:</Text>
         <DropDownPicker
           open={openTest}
           value={valueTest}
@@ -91,7 +93,7 @@ export const resultSelect = (props) => {
           setValue={setValueTest}
           setItems={setTestItems}
         />
-        <Text style = {{marginVertical: 15}}>Select Product:</Text>
+        <Text style = {{marginVertical: 10, alignSelf:"flex-start", fontSize:16}}>Select Product:</Text>
         <DropDownPicker
           open={open}
           value={value}
@@ -102,9 +104,14 @@ export const resultSelect = (props) => {
           setItems={setItems}
           onChangeValue={()=>{setBtnStatus(false)}}
         />
+        <View style={{minWidth:"100%", flexDirection:"row", flexShrink:1, justifyContent:"space-evenly"}}>
         <TouchableOpacity disabled = {btnStatus} onPress = {showResults} style = {{...styles.roundButton}}>
-          <Text>View Results</Text>
+          <Text>Get IDs</Text>
         </TouchableOpacity>
+        <TouchableOpacity disabled = {btnStatus} onPress = {()=>navigation.goBack()} style = {{...styles.roundButton}}>
+          <Text>Back</Text>
+        </TouchableOpacity>
+        </View>
         
         {countLoop?.map((datum, index) => (
               <ResultCards key = {index} id = {countLoop[index].tid} valueTest = {valueTest}/>
@@ -120,8 +127,8 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 10,
-      width: "50%",
-      height: 40,
+      width:150,
+      height: 50,
       backgroundColor: '#d3d3d3',
   },
 })

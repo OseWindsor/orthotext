@@ -25,11 +25,9 @@ export const TestTypeDrop = ({onUpdate }) => {
         items={testTypes}
         setOpen={setTestTypeOpen}
         setValue={setTestTypeValue}
-        showArrowIcon={false}
-        showTickIcon={false}
         setItems={setTestTypes}
-        labelStyle = {{textAlign: 'center', fontSize:18}}
-        textStyle = {{textAlign: 'center', fontSize:18}}
+        labelStyle = {{textAlign: 'left', fontSize:18}}
+        textStyle = {{textAlign: 'left', fontSize:18}}
       />
     )
 }

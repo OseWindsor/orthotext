@@ -87,31 +87,29 @@ const BeginPage = ({navigation}) => {
             </View> 
             <Modal isVisible={isModalVisible} hideModalContentWhileAnimating={true} useNativeDriver={true} animationIn="slideInDown" backdropTransitionInTiming={0} backdropColor="white" backdropOpacity={1}>
               <SafeAreaView style={{flex:1, marginTop:"30%"}}>
-                <Text style={{alignSelf:"center"}}>Enter participant info:</Text>
+                <Text style={{alignSelf:"flex-start", paddingVertical:10, fontSize:25,fontWeight:"bold"}}>Enter participant info</Text>
+                <Text style={{alignSelf:"flex-start", paddingVertical:10, fontSize:16}}>First Name:</Text>
                 <TextInput
                   style={styles.input}
                   onChangeText={onChangeTextFN}
                   value={textFN}
                   autoCorrect={false}
                   clearButtonMode="while-editing"
-                  placeholder="First Name"
                   returnKeyType="next"
-                  placeholderTextColor="black"
                   onSubmitEditing={() => ref_input2.current.focus()}
                 />
+                <Text style={{alignSelf:"flex-start", paddingBottom:10, fontSize:16}}>Last Name:</Text>
                 <TextInput
                   style={styles.input}
                   onChangeText={onChangeTextLN}
                   value={textLN}
                   autoCorrect={false}
                   clearButtonMode="while-editing"
-                  placeholder="Last Name"
                   ref={ref_input2}
                   onSubmitEditing={addParticipant}
                   enablesReturnKeyAutomatically = {true}
-                  placeholderTextColor="black"
                 />
-                <View>
+                <View style={{flex:1, flexDirection: "row", alignItems:"baseline", justifyContent:"space-evenly"}}>
                 <TouchableOpacity disabled={((textFN && textLN) ==""?true:false)} style={(textFN && textLN) ==""?{...styles.homeButtonDisabled, alignSelf:"center"}:{...styles.homeButton,alignSelf:"center"}} onPress={addParticipant}>
                   <Text>Register</Text>
                 </TouchableOpacity>
@@ -134,10 +132,11 @@ const LandingPage = ({route, navigation}) => {
   const [productOpen, setProductOpen] = useState(false);
   const [productValue, setProductValue] = useState(null);
   const [productItems, setProductItems] = useState([
+    {label: 'No grip', value: 'No grip'},
     {label: 'Metal Ring', value: 'Metal Ring'},
     {label: 'Pop Socket', value: 'Pop Socket'},
     {label: 'Hand Loop', value: 'Hand Loop'},
-    {label: 'Orthotext', value: 'Orthotext'}
+    {label: 'Orthotext', value: 'Orthotext'},
   ]);
 
   const onTestUpdate = (testMode) => {
@@ -165,14 +164,13 @@ const LandingPage = ({route, navigation}) => {
   })
   
   return <View style={styles.container}>
-          <Text style={{fontWeight:'bold',fontSize:20}}>Device under test</Text>
-          <Text style={{ fontSize:18}}>{Device.modelId}</Text>
-          <View style = {{padding: 10, alignItems: "center", paddingHorizontal: 80, zIndex: 15}}>
-              <Text style={{fontWeight:'bold',fontSize:20, marginBottom: 8}}>Participant:</Text>
+          <Text style={{marginTop:20, marginBottom:5, fontSize: 25, alignSelf:"flex-start", fontWeight:"bold", paddingHorizontal:20}}>Select test options</Text>
+          <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 15}}>
+              <Text style={{fontSize:16, marginBottom: 8}}>Participant:</Text>
               <ParticipantDrop onUpdate={onParticipantUpdate}></ParticipantDrop>
           </View>
-          <View style = {{padding: 10, alignItems: "center", paddingHorizontal: 80, zIndex:10}}>
-            <Text style={{fontWeight:'bold',fontSize:20, marginBottom: 8}}>Product Under Test:</Text>
+          <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex:10}}>
+            <Text style={{fontSize:16, marginBottom: 8}}>Product Under Test:</Text>
             <DropDownPicker
               zIndex={10}
               zIndexInverse={1000}
@@ -184,26 +182,32 @@ const LandingPage = ({route, navigation}) => {
               placeholder="Select product"
               onChangeValue={()=>{SetBtnState(false) 
                                   setStartTime('Begin')}}
-              showArrowIcon={false}
-              showTickIcon={false}
+
               setItems={setProductItems}
-              labelStyle = {{textAlign: 'center', fontSize:18}}
-              textStyle = {{textAlign: 'center', fontSize:18}}
+              labelStyle = {{textAlign: 'left', fontSize:18}}
+              textStyle = {{textAlign: 'left', fontSize:18}}
             />
           </View>
           {testSelected == 'Typing' && 
-            <View style = {{padding: 20, alignItems: "center", paddingHorizontal: 80, zIndex: 5}}>
-              <Text style={{fontWeight:'bold',fontSize:20, marginBottom: 8}}>Select test mode</Text>
+            <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 5}}>
+              <Text style={{fontSize:16, marginBottom: 8}}>Select Test Mode</Text>
               <TestTypeDrop onUpdate={onTestUpdate}></TestTypeDrop>
             </View>
           }
-
-          <TouchableOpacity disabled = {btnState} style={(btnState)?{...styles.homeButtonDisabled}:{...styles.homeButton}} onPress = {() => setStartTime(3)}>
-            <Text>{startTime}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{...styles.homeButton}} onPress = {() => navigation.navigate('resultSelect')}>
-            <Text>View Results</Text>
-          </TouchableOpacity>
+          <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 2}}>
+              <Text style={{fontSize:16, marginBottom: 8}}>Device:</Text>
+              <View style={{borderWidth:1, borderRadius: 10, minWidth:"100%", height:50, justifyContent:"center", backgroundColor:"#EDEDED"}}>
+              <Text style={{ fontSize:18, padding: 10}}>{Device.modelId}</Text>
+              </View>
+          </View>
+          <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-between", flex:1, paddingHorizontal:20, marginTop:20, minWidth:"100%"}}>
+            <TouchableOpacity disabled = {btnState} style={(btnState)?{...styles.homeButtonDisabled}:{...styles.homeButton}} onPress = {() => setStartTime(3)}>
+              <Text>{startTime}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{...styles.homeButton}} onPress = {() => navigation.navigate('resultSelect')}>
+              <Text>View Results</Text>
+            </TouchableOpacity>
+          </View>
         </View> 
 }
 
@@ -285,26 +289,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: "flex-start",
   },
   input: {
     height: 60,
-    margin: 12,
+    marginBottom:15,
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 20
+    padding: 15,
+    borderRadius: 10,
+    minWidth:"100%"
   },
   homeButton: {
-    marginTop: 20,
     alignItems: 'center',
     width: 150,
     backgroundColor: "#DDDDDD",
     padding: 20,
     borderRadius: 20,
+
   },
   homeButtonDisabled: {
-    marginTop: 20,
     alignItems: 'center',
     width: 150,
     backgroundColor: "#f5f5f5",
