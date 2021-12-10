@@ -46,45 +46,44 @@ const BeginPage = ({navigation}) => {
     onChangeTextLN("")
   }
 
-  return  <View style = {{flex:1, flexDirection: "column"}}>
+  return  <View style = {{...styles.container}}>
+            <View style={{margin:10, padding: 20, borderRadius:20, backgroundColor:"#fff",    shadowColor: '#000',
+            shadowOpacity: 0,
+            shadowOffset: { width: 0, height: 1 },
+            shadowRadius: 5,}}>
+            <Text style={{fontSize:30, fontWeight:"bold", color:"#064663"}}>Welcome</Text>
+              <Text style={{fontSize:30, fontWeight:"normal", color:"#064663"}}>Select a test to begin</Text>
+            </View>
             <View style={{...styles.homeContainer, justifyContent: "center", flexWrap:"wrap", alignContent:"center"}}>
               <TouchableOpacity style={{...styles.welcomeButton}} onPress = {() => navigation.navigate('LandingPage', {testSelected: 'Tapping'})}>
-                  <ImageBackground source={require('./assets/hb1.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                  <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Tapping</Text>
-                  <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Test</Text>
+                  <Text style={{textAlign:"left", fontSize:25, fontWeight:"bold", color:"#064663"}}>Tapping</Text>
+                  <Text style={{textAlign:"left", fontSize:25, fontWeight:"normal", color:"#064663"}}>Test</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{...styles.welcomeButton}} onPress = {() => navigation.navigate('LandingPage', {testSelected: 'Swipe'})}>
-                <ImageBackground source={require('./assets/hb2.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                  <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Swiping</Text>
-                  <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Test</Text>
+                  <Text style={{textAlign:"left", fontSize:25, fontWeight:"bold", color:"#064663"}}>Swiping</Text>
+                  <Text style={{textAlign:"left", fontSize:25, fontWeight:"normal", color:"#064663"}}>Test</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.welcomeButton} onPress = {() => navigation.navigate('LandingPage', {testSelected: 'Scrolling'})}>
-              <ImageBackground source={require('./assets/hb4.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Scrolling</Text>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Test</Text>
+                <Text style={{textAlign:"left", fontSize:25, fontWeight:"bold", color:"#064663"}}>Scrolling</Text>
+                <Text style={{textAlign:"left", fontSize:25, fontWeight:"normal", color:"#064663"}}>Test</Text>
               </TouchableOpacity>
               <TouchableOpacity style={{...styles.welcomeButton}} onPress = {() => navigation.navigate('LandingPage', {testSelected: 'Typing'})}>
-              <ImageBackground source={require('./assets/hb3.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Typing</Text>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Test</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.welcomeButton} onPress = {toggleModal}>
-              <ImageBackground source={require('./assets/hb5.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Add</Text>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Participant</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{...styles.welcomeButton}} onPress={()=>navigation.navigate('downloadPage')}>
-              <ImageBackground source={require('./assets/hb6.png')} style={{width: '100%', height: '100%', opacity:0.1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Download</Text>
-                <Text style={{textAlign:"left", fontSize:23, fontWeight:"normal"}}>Data</Text>
+                <Text style={{textAlign:"left", fontSize:25, fontWeight:"bold", color:"#064663"}}>Typing</Text>
+                <Text style={{textAlign:"left", fontSize:25, fontWeight:"normal", color:"#064663"}}>Test</Text>
               </TouchableOpacity>
             </View> 
+            <View style = {{marginHorizontal:10, justifyContent:"flex-end"}}>
+              <View style={{...styles.topHomeContainer}}>
+              <TouchableOpacity style={styles.welcomeRoundButton} onPress = {toggleModal}>
+              <ImageBackground source={require('./assets/hb5.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+              </TouchableOpacity>
+              <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={()=>navigation.navigate('downloadPage')}>
+              <ImageBackground source={require('./assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+              </TouchableOpacity>
+              </View>
+            </View>
             <Modal isVisible={isModalVisible} hideModalContentWhileAnimating={true} useNativeDriver={true} animationIn="slideInDown" backdropTransitionInTiming={0} backdropColor="white" backdropOpacity={1}>
               <SafeAreaView style={{flex:1, marginTop:"30%"}}>
                 <Text style={{alignSelf:"flex-start", paddingVertical:10, fontSize:25,fontWeight:"bold"}}>Enter participant info</Text>
@@ -258,12 +257,12 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator  screenOptions={{
             headerStyle: {
-              backgroundColor: '#f4511e',
+              backgroundColor: 'white',
             },
-            headerTintColor: '#fff',
+            headerTintColor: '#064663',
             headerTitleAlign: 'center',
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: 'normal',
             },
             }}>
           <Stack.Screen name="Home" component={BeginPage}  options={{title: 'Home'}}/>
@@ -288,9 +287,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    justifyContent: "flex-start",
+    justifyContent:"space-evenly",
   },
   input: {
     height: 60,
@@ -320,19 +317,50 @@ const styles = StyleSheet.create({
   welcomeButton: {
     margin: 10,
     elevation: 10,
-    borderWidth: 1.5,
     justifyContent: "center",
     width: 150,
     height:150,
-    backgroundColor: "#EDEDED",
+    backgroundColor: "#fff",
     borderColor:"#3C415C",
     padding: 20,
     borderRadius: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 7,  
+  },
+  welcomeRoundButton: {
+
+    justifyContent: "center",
+    width: 80,
+    height:80,
+    backgroundColor: "#064663",
+    borderColor:"#3C415C",
+    padding: 20,
+    borderRadius: 100,
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 7,  
   },
   homeContainer: {
-    flex: 1,
+    paddingVertical:20,
     backgroundColor: '#fff',
     flexDirection: 'row',
-    alignItems:"center"
+    alignItems:"center",
+    marginHorizontal:10,
+    borderRadius:20,
+    marginBottom:10,
+    shadowColor: '#000',
+    shadowOpacity: 0,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 5,  
   },
+  topHomeContainer: {
+    flexDirection:"row", justifyContent:"space-around", marginBottom:10, borderRadius: 20, backgroundColor:"#fff", paddingVertical:20,
+    shadowColor: '#000',
+    shadowOpacity: 0,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 5,  
+  }
 });
