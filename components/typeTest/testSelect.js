@@ -17,17 +17,26 @@ export const TestTypeDrop = ({onUpdate }) => {
 
     return (
         <DropDownPicker
-        zIndex={3000}
-        zIndexInverse={1000}
+        zIndex={1000}
+        zIndexInverse={3000}
         open={testTypeOpen}
         value={testTypeValue}
         onChangeValue={handleOnClick}
+        dropDownDirection={"BOTTOM"}
         items={testTypes}
         setOpen={setTestTypeOpen}
         setValue={setTestTypeValue}
         setItems={setTestTypes}
+        style={{...styles.dropStyle}}
         labelStyle = {{textAlign: 'left', fontSize:18}}
         textStyle = {{textAlign: 'left', fontSize:18}}
       />
     )
 }
+
+const styles = StyleSheet.create({
+  dropStyle: {borderWidth:0,    shadowColor: '#000',
+  shadowOpacity: 0.4,
+  shadowOffset: { width: 0, height: 1 },
+  shadowRadius: 3,}
+})

@@ -89,7 +89,7 @@ export const TapResult = (props) => {
                     <Text style={{fontSize:20, paddingLeft: 15}}>Accuracy: {tid.params.tdata[0][1]}%</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Mean Reaction Time: {tid.params.tdata[1][1]}s</Text>
                 </View>
-                <View style={{backgroundColor: "green", width:"60%", height:'50%', alignItems:"flex-start", alignSelf: "flex-end", position:"relative", justifyContent:"flex-start"}}>
+                <View style={{backgroundColor: "green", width:"60%", height:'50%', alignItems:"flex-start", alignSelf: "flex-start", position:"relative", justifyContent:"flex-start"}}>
                     <Text style={{fontSize:25, padding: 15, fontWeight:"bold"}}>Zone 1</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Accuracy: {tid.params.tdata[0][0]}%</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Mean Reaction Time: {tid.params.tdata[1][0]}s</Text>

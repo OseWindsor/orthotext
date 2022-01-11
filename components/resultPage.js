@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, Dimensions  } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Alert, ScrollView  } from 'react-native';
 import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { Table, TableWrapper, Row, Rows, Col } from 'react-native-table-component';
 import {Database} from "../Database"
@@ -36,6 +36,32 @@ export const resultPage = (props) => {
         await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
     }
 
+    async function discardData(){
+        console.log('test')
+        await db.execute("update summary set testStatus = ? where id =?",[0,props.route.params.tid])
+        Alert.alert(
+            "Test Discarded",
+            "App will now navigate to home screen",
+            [
+              { text: "OK", onPress: () => navigation.navigate('Home')}
+            ]
+          );
+    }
+
+    const createTwoButtonAlert = () =>
+    Alert.alert(
+      "Discard Test",
+      "Are you sure you want to discard this test? This action cannot be reversed",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Confirm", onPress: discardData }
+      ]
+    );
+
     useEffect(() => {
         async function getData(){
             //console.log(props.route.params.tid)
@@ -61,7 +87,7 @@ export const resultPage = (props) => {
     }, [props.route.params.tid]);
 
     return (
-        <View style={{...styles.container}}>
+        <ScrollView contentContainerStyle={{...styles.container}}>
             <View style={{margin: 7, alignItems: "center"}}>
                 <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
             </View>
@@ -84,23 +110,31 @@ export const resultPage = (props) => {
                     <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
                 </View>
             </View>
-            <View style={{alignItems: "center", marginTop: 15}}>
-                <TouchableOpacity onPress = {() => navigation.navigate('TapResult', {params: {tid: props.route.params.tid, tdata: tableData}})} style={{...styles.roundButton}}>
-                    <Text>View Detailed Results</Text>
+
+            <View style={{alignItems: "center", marginTop: 15, flexDirection:"row", justifyContent:"space-evenly"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('TapResult', {params: {tid: props.route.params.tid, tdata: tableData}})}>
+                <ImageBackground source={require('../assets/hb3.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
                 </TouchableOpacity>
-                <TouchableOpacity onPress = {downloadData}  style={{...styles.roundButton}}>
-                    <Text>Download Data</Text>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
+                <ImageBackground source={require('../assets/hb2.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
                 </TouchableOpacity>
-                <TouchableOpacity onPress = {() => navigation.navigate('resultSelect')} style={{...styles.roundButton}}>
-                    <Text>View Another Result</Text>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
+                <ImageBackground source={require('../assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+                </TouchableOpacity>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
+                <ImageBackground source={require('../assets/hb4.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, paddingTop: 15, backgroundColor: '#fff' },
+    container: { flexGrow: 1, paddingTop: 15, backgroundColor: '#fff' },
     head: {  height: 40},
     wrapper: { flexDirection: 'row' },
     title: { flex: 2},
@@ -113,8 +147,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-        width: "95%",
+        width: "45%",
         height: 60,
         backgroundColor: '#d3d3d3',
     },
+    welcomeRoundButton: {
+
+        justifyContent: "center",
+        width: 70,
+        height:70,
+        backgroundColor: "#064663",
+        borderColor:"#3C415C",
+        padding: 20,
+        borderRadius: 100,
+        shadowColor: '#000',
+        shadowOpacity: 0.4,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 7,  
+      },
   });

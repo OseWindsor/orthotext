@@ -24,7 +24,7 @@ export const ParticipantDrop = ({onUpdate }) => {
                 })
                 setParticipants(values)
             }else{
-                await db.execute("insert into participants (firstName, lastName) values (?,?)",["Jane", "Doe"])
+                await db.execute("insert into participants (firstName, lastName, handSize) values (?,?,?)",["Jane", "Doe", "Medium"])
                 console.log("inserted")
             }
 
@@ -34,11 +34,13 @@ export const ParticipantDrop = ({onUpdate }) => {
 
     return (
         <DropDownPicker
-        zIndex={3000}
+        zIndex={4000}
         zIndexInverse={1000}
         open={participantOpen}
         value={participantValue}
+        dropDownDirection={"BOTTOM"}
         searchable={true}
+        style={{...styles.dropStyle}}
         onChangeValue={handleOnClick}
         placeholder="Select Participant"
         items={participants}
@@ -50,3 +52,10 @@ export const ParticipantDrop = ({onUpdate }) => {
       />
     )
 }
+
+const styles = StyleSheet.create({
+  dropStyle: {borderWidth:0,    shadowColor: '#000',
+  shadowOpacity: 0.4,
+  shadowOffset: { width: 0, height: 1 },
+  shadowRadius: 3,}
+})

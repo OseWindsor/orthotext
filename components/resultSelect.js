@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, Dimensions  } from 'react-native';
-import { CommonActions, useNavigation } from '@react-navigation/native';
-import { Table, TableWrapper, Row, Rows, Col } from 'react-native-table-component';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView  } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {Database} from "../Database"
 
@@ -10,6 +9,16 @@ const db = new Database("result.db");
 //component to generate cards based on test ids array
 const ResultCards = (props) => {
 const navigation = useNavigation()
+const [fName,setFName] = useState("Joe")
+
+useEffect(()=>{
+  async function getData(){
+    let res = await db.execute('select firstName from participants where id = ?',[props.partID])
+    setFName(res.rows[0].firstName)
+  }
+  getData()
+},[])
+
 async function showFullResult(){
   let res = await db.execute('select device, testProduct,pid from summary where id = ?',[props.id])
   console.log(res.rows)
@@ -28,10 +37,28 @@ async function showFullResult(){
   }
   
 }
-return <View style={{padding: 10, borderWidth: 1, marginTop: 15, borderRadius: 10, width: "100%", alignItems: 'center'}}>
-  <Text>Test Id: {props.id}</Text>
-  <TouchableOpacity onPress = {showFullResult} style = {{...styles.roundButton}}>
-    <Text>View full results</Text>
+return <View style={{padding: 10, borderWidth: 0, margin: 5, borderRadius: 10, width: "90%", alignItems: 'left', justifyContent:"center",backgroundColor:"white",    shadowColor: '#000',
+shadowOpacity: 0.2,
+shadowOffset: { width: 0, height: 1 },
+shadowRadius: 4,}}>
+  <Text>
+    <Text style={{fontWeight:"bold"}}>Test Id: </Text>
+    <Text>{props.id}</Text>
+  </Text>
+  <Text>
+    <Text style={{fontWeight:"bold"}}>Participant: </Text>
+    <Text>{fName}</Text>
+  </Text>
+  <Text>
+    <Text style={{fontWeight:"bold"}}>Posture: </Text>
+    <Text>{props.posture}</Text>
+  </Text>
+  <Text>
+    <Text style={{fontWeight:"bold"}}>Test Hand: </Text>
+    <Text>{props.TH}</Text>
+  </Text>
+  <TouchableOpacity onPress = {showFullResult} style = {{...styles.roundIDButton, alignSelf:"flex-end",position:"absolute"}}>
+    <Text>Open</Text>
   </TouchableOpacity>
 </View>
 }
@@ -49,8 +76,8 @@ export const resultSelect = (props) => {
     const [openTest, setOpenTest] = useState(false);
     const [valueTest, setValueTest] = useState('tapping');
     const [itemsTest, setTestItems] = useState([
-      {label: 'Swiping', value: 'swiping'},
       {label: 'Tapping', value: 'tapping'},
+      {label: 'Swiping', value: 'swiping'},
       {label: 'Scrolling', value: 'scrolling'},
       {label: 'Typing', value: 'typing'}
     ]);
@@ -72,16 +99,17 @@ export const resultSelect = (props) => {
     //generate result ids array based on test and product selected
     async function showResults(){
       let table = (valueTest=='tapping')?'tapResult':(valueTest=='swiping')?'swipeResult':(valueTest=='scrolling')?'scrollResult':'typeResult'
-      let idArr = await db.execute('select id from summary where testProduct = ? and testStatus = true and testType = ? order by id desc limit 3',[value,valueTest])
+      let idArr = await db.execute('select id, pid, posture, testHand from summary where testProduct = ? and testStatus = true and testType = ? order by id desc',[value,valueTest])
       let idExtract = idArr.rows.map(a => a.id)
       let resultDataOverall = await db.execute('select tid as tid from ' + table + ' group by tid order by id desc')
       let filteredOverall = resultDataOverall.rows.filter(row => idExtract.includes(row.tid))
-      setCountLoop(filteredOverall)
+      setCountLoop(idArr.rows)
     }
     
   
     return (
-      <View style = {{flex:1, padding: 10, alignItems: 'center', zIndex: 10, position: 'relative', paddingHorizontal:20}}>
+      <View style={{flex:1, alignItems:"flex-start"}}>
+      <View style = {{flexGrow:1, padding: 10, alignItems: 'center', zIndex: 10, position: 'relative', paddingHorizontal:20}}>
         <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:25, fontWeight:"bold", marginTop:15}}>View Results</Text>
         <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:16}}>Select Test:</Text>
         <DropDownPicker
@@ -92,6 +120,10 @@ export const resultSelect = (props) => {
           setOpen={setOpenTest}
           setValue={setValueTest}
           setItems={setTestItems}
+          style={{borderWidth:0,    shadowColor: '#000',
+          shadowOpacity: 0.4,
+          shadowOffset: { width: 0, height: 1 },
+          shadowRadius: 3,}}
         />
         <Text style = {{marginVertical: 10, alignSelf:"flex-start", fontSize:16}}>Select Product:</Text>
         <DropDownPicker
@@ -101,6 +133,10 @@ export const resultSelect = (props) => {
           zIndex={10}
           setOpen={setOpen}
           setValue={setValue}
+          style={{borderWidth:0,    shadowColor: '#000',
+          shadowOpacity: 0.4,
+          shadowOffset: { width: 0, height: 1 },
+          shadowRadius: 3,}}
           setItems={setItems}
           onChangeValue={()=>{setBtnStatus(false)}}
         />
@@ -112,11 +148,19 @@ export const resultSelect = (props) => {
           <Text>Back</Text>
         </TouchableOpacity>
         </View>
-        
-        {countLoop?.map((datum, index) => (
-              <ResultCards key = {index} id = {countLoop[index].tid} valueTest = {valueTest}/>
-            ))}
       </View>
+      {countLoop.length>0 && (
+        <Text style = {{marginBottom: 5, marginLeft:20,alignSelf:"flex-start", fontSize:25, fontWeight:"bold"}}>Results List</Text>
+        )
+      }
+      <ScrollView contentContainerStyle={{flexGrow:1, borderWidth:0, alignItems:"center", minWidth:"100%"}}>
+        {countLoop?.map((datum, index) => (
+          <ResultCards key = {index} id = {countLoop[index].id} partID = {countLoop[index].pid} posture={countLoop[index].posture} TH={countLoop[index].testHand} valueTest = {valueTest}/>
+        ))}
+      </ScrollView>
+
+      </View>
+
     );
 }
 
@@ -130,5 +174,22 @@ const styles = StyleSheet.create({
       width:150,
       height: 50,
       backgroundColor: '#d3d3d3',
+      shadowColor: '#000',
+      shadowOpacity: 0.4,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 3,
   },
+  roundIDButton: {
+    right:"5%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    width:70,
+    height: "100%",
+    backgroundColor: '#d3d3d3',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+},
 })

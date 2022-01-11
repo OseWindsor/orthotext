@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Dimensions  } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ImageBackground, Alert  } from 'react-native';
 import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { Table, TableWrapper, Cell, Row, Rows, Col, Cols } from 'react-native-table-component';
 import {Database} from "../../Database.js"
@@ -33,6 +33,32 @@ export const scrollResultPage = (props) => {
         await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
     }
 
+    async function discardData(){
+        console.log('test')
+        await db.execute("update summary set testStatus = ? where id =?",[0,props.route.params.tid])
+        Alert.alert(
+            "Test Discarded",
+            "App will now navigate to home screen",
+            [
+              { text: "OK", onPress: () => navigation.navigate('Home')}
+            ]
+          );
+    }
+
+    const createTwoButtonAlert = () =>
+    Alert.alert(
+      "Discard Test",
+      "Are you sure you want to discard this test? This action cannot be reversed",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Confirm", onPress: discardData }
+      ]
+    );
+
     useEffect(() => {
         async function getData(){
             let res = await db.execute("select alignment, sum(case when trials > 1 Then 0 else 1 end) as avgTrials, avg(timeTaken) as avgTimeTaken from scrollResult where tid = ? group by alignment",[props.route.params.tid])
@@ -48,7 +74,7 @@ export const scrollResultPage = (props) => {
         getData()
     },[props.route.params.tid])
     return (
-        <View>
+        <ScrollView>
             <View style={{margin: 7, alignItems: "center"}}>
                 <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
             </View>
@@ -70,15 +96,21 @@ export const scrollResultPage = (props) => {
             <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
                 <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
             </View>
-            <View style={{alignItems: "center", marginTop: 15}}>
-                <TouchableOpacity onPress = {downloadData} style={{...styles.roundButton}}>
-                    <Text>Download Data</Text>
+            <View style={{alignItems: "center", marginVertical: 15, flexDirection:"row", justifyContent:"space-evenly"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
+                <ImageBackground source={require('../../assets/hb2.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
                 </TouchableOpacity>
-                <TouchableOpacity onPress = {() => navigation.navigate('resultSelect')} style={{...styles.roundButton}}>
-                    <Text>View Another Result</Text>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
+                <ImageBackground source={require('../../assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+                </TouchableOpacity>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
+                <ImageBackground source={require('../../assets/hb4.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
@@ -100,4 +132,17 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: '#d3d3d3',
     },
+    welcomeRoundButton: {
+        justifyContent: "center",
+        width: 70,
+        height:70,
+        backgroundColor: "#064663",
+        borderColor:"#3C415C",
+        padding: 20,
+        borderRadius: 100,
+        shadowColor: '#000',
+        shadowOpacity: 0.4,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 7,  
+      },
   });

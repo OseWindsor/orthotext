@@ -26,12 +26,14 @@ export const ExpScroll = (props) => {
     let prod = route.params.product
     let dev = route.params.device
     let pid = route.params.PID
+    let posture = route.params.posture
+    let testHand = route.params.hand
 
     //create entry in swipe test summary table at start
     useEffect(() => {
         //function to write testid data to db
         async function writeData() {
-            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid) values (?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid])
+            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid,posture,testHand])
             tid = res1.insertId
         }
         writeData()

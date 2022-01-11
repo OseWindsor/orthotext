@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Button, Dimensions, View, Image, Text, TextPropTypes, TouchableHighlight } from 'react-native';
+import { StyleSheet, TouchableOpacity, Button, SafeAreaView, View, Image, Text, TextPropTypes, TouchableHighlight } from 'react-native';
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import {Database} from "../../Database.js"
 import SignatureScreen from "react-native-signature-canvas";
@@ -18,6 +18,8 @@ export const SwipeCanvas = (props) => {
     let prod = route.params.product
     let dev = route.params.device
     let pid = route.params.PID
+    let posture = route.params.posture
+    let testHand = route.params.hand
     const style = `.m-signature-pad {box-shadow: none; border: none; } 
     .m-signature-pad--body {border: none;}
     body,html {
@@ -26,6 +28,7 @@ export const SwipeCanvas = (props) => {
     //create entry in swipe test summary table at start
     useEffect(() => {
       navigation.setOptions({
+        headerShown:false,
         headerLeft: () => (<View></View>),
         headerRight: () => (<View style={{flexDirection:"row"}}>
             <Button onPress = {()=>navigation.goBack()} title = 'Quit' color = "#f11e"></Button>
@@ -34,7 +37,7 @@ export const SwipeCanvas = (props) => {
 
       //function to write testid data to db
       async function writeData() {
-        const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid) values (?, ?, ?, ?, ?)", [dev,prod,false,"swiping",pid])
+        const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture,testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"swiping",pid,posture,testHand])
         tid = res1.insertId
         //console.log(res1)
       }
@@ -125,7 +128,7 @@ export const SwipeCanvas = (props) => {
         webStyle={style} 
       />
       </View>
-      <View style={{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "50%"}}>
+      <View style={(trialState)?{...styles.viewDisabled}:{...styles.viewDisabled}}>
         <TouchableOpacity disabled = {trialState==false?false:true} style={(trialState)?{...styles.disabledNextButton}:{...styles.nextButton}} onPress={handleNext}>
           <Text>{trialState==false && trialCount < 9 ?'Next trial':'Swipe'}</Text>
         </TouchableOpacity>
@@ -144,8 +147,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: "gray",
         zIndex:10,
-        padding: 20,
+        padding: 5,
         borderRadius: 20,
+        width:"100%"
       },
       disabledNextButton: {
         alignItems: 'center',
@@ -154,8 +158,10 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         backgroundColor: "#FDFDFD",
         elevation: 7,
-        zIndex:10,
-        padding: 20,
+        padding: 5,
+        width:"100%",
         borderRadius: 20,
-      }
+      },
+      viewDisabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "25%", flexDirection:"row", justifyContent:"space-around"},
+
  }); 

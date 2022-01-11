@@ -60,7 +60,7 @@ export const downloadPage = (props) => {
 
     async function downloadSummary(){
         const json2csvParser = new Parser();
-        let res = await db.execute('select id, testType as Test_Name, testStatus as Test_Status, testProduct as Product_Tested,pid as Participant_id,device as Device,testMode as Type_Test_Mode from summary')
+        let res = await db.execute('select id, testType as Test_Name, testStatus as Test_Status, testProduct as Product_Tested,pid as Participant_id,device as Device,testMode as Type_Test_Mode, posture as Posture, testhand as Test_Hand from summary')
         if(res.rows.length>0){
             const csv = json2csvParser.parse(res.rows);
             let filename = 'summary.csv'; // or some other way to generate filename

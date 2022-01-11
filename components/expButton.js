@@ -14,6 +14,8 @@ export const ExpButton = (props) => {
     let prod = route.params.product
     let dev = route.params.device
     let pid = route.params.PID
+    let posture = route.params.posture
+    let testhand = route.params.hand
 
     //function to run onMount
     useEffect(() => {
@@ -27,7 +29,7 @@ export const ExpButton = (props) => {
         //function to write testid data to db
         async function writeData() {
             console.log(typeof prod)
-            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid) values (?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid])
+            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid, posture, testhand])
             tid = res1.insertId
             console.log(res1)
         }
@@ -55,7 +57,6 @@ export const ExpButton = (props) => {
     //function to handle correct button press
     let changePosition = arg1 => async () => {
         console.log(xPos.length)
-        console.log("Hello")
         let elapsedTime = (new Date() * 1) - startTime
         if(arg1 == 0){ //on accurate press condition
             //insert data to result table

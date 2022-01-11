@@ -30,14 +30,18 @@ export const ExpType = (props) => {
   let dev = route.params.device
   let testType = route.params.testMode 
   let pid = route.params.PID
+  let posture = route.params.posture
+  let testHand = route.params.hand
 
   //function to record results
   async function recordData(){
     let timeNow = Date.now()*1
     let timeElapsed = startTime==0?0:((timeNow - startTime)/1000)
-    let rec = await db.execute("insert into typeResult (tid,trialNumber,wpm,accuracy,timeElapsed) values (?,?,?,?,?)",[tid,trialCount,wordspm,typingAccuracy,timeElapsed])
-    let result = await db.execute("select timeElapsed, accuracy, trialNumber from typeResult where tid = ?",[tid])
-    console.log(result.rows)
+    if(timeElapsed!=0){
+      let rec = await db.execute("insert into typeResult (tid,trialNumber,wpm,accuracy,timeElapsed) values (?,?,?,?,?)",[tid,trialCount,wordspm,typingAccuracy,timeElapsed])
+      let result = await db.execute("select timeElapsed, accuracy, trialNumber from typeResult where tid = ?",[tid])
+      console.log(result.rows)
+    }
   }
 
   async function updateStatus(){
@@ -62,7 +66,7 @@ export const ExpType = (props) => {
   //initialize values on first render
   React.useEffect(() => {
     async function writeData() {
-      const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, testMode, pid) values (?, ?, ?, ?, ?, ?)", [dev,prod,false,"typing",testType,pid])
+      const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, testMode, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"typing",testType,pid,posture,testHand])
       tid = res1.insertId
       console.log(tid)
     }
@@ -156,6 +160,7 @@ export const ExpType = (props) => {
       if(enteredChar != 'Backspace'){
         //if trial count < 5, move to next trial or navigate home
         if(currentIndex+1==sentence.length && (testType == 'noDelete' || testType == 'skip')){
+          clearInterval(timer)
           recordData()
           if(trialCount == 5){
             updateStatus()
@@ -166,6 +171,7 @@ export const ExpType = (props) => {
             setTrialState(trialCount)
           }
         }else if(currentIndex-wrongIndexes.length+1==sentence.length){
+          clearInterval(timer)
           recordData()
           if(trialCount == 5){
             updateStatus()

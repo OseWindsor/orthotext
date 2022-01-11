@@ -1,6 +1,6 @@
 import * as Device from 'expo-device';
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, View, ImageBackground, Text, TextInput, TextPropTypes,SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useRef, createRef } from 'react';
+import { StyleSheet, TouchableOpacity, View, ImageBackground, Text, TextInput, TextPropTypes,SafeAreaView, ScrollView, LogBox } from 'react-native';
 import Modal from "react-native-modal";
 import { ParticipantDrop } from './components/participantDrop';
 import { ExpButton } from './components/expButton';
@@ -17,9 +17,13 @@ import { TestTypeDrop } from './components/typeTest/testSelect';
 import { typeResultPage } from './components/typeTest/typeResultPage';
 import { scrollResultPage } from './components/scrollTest/scrollResultPage';
 import { downloadPage } from './components/downloadPage';
+import { HSDrop, TPDrop } from './components/hangSizeDrop';
 import DropDownPicker from 'react-native-dropdown-picker';
+import ButtonToggleGroup from 'react-native-button-toggle-group';
 import * as SQLite from "expo-sqlite";
 import {Database} from "./Database"
+
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead.']);
 
 const db = SQLite.openDatabase("result.db")
 const dbs = new Database("result.db");
@@ -29,7 +33,9 @@ const BeginPage = ({navigation}) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [textFN, onChangeTextFN] = React.useState("");
   const [textLN, onChangeTextLN] = React.useState("");
+  const [handSize, setHandSize] = React.useState("Medium");
   const ref_input2 = useRef();
+  const ref = createRef();
 
   //function to toggle modal visibility
   const toggleModal = () => {
@@ -38,12 +44,18 @@ const BeginPage = ({navigation}) => {
     onChangeTextLN("")
   };
 
+  //function to add new participant details to database
   async function addParticipant() {
     console.log(textLN)
-    dbs.execute('insert into participants (firstName,lastName) values (?,?)',[textFN,textLN])
+    dbs.execute('insert into participants (firstName,lastName, handSize) values (?,?,?)',[textFN,textLN,handSize])
     setModalVisible(!isModalVisible);
+    console.log(handSize)
     onChangeTextFN("")
     onChangeTextLN("")
+  }
+
+  function onHSUpdate(handSize) {
+    setHandSize(handSize)
   }
 
   return  <View style = {{...styles.container}}>
@@ -75,17 +87,15 @@ const BeginPage = ({navigation}) => {
             <View style = {{marginHorizontal:10, justifyContent:"flex-end"}}>
               <View style={{...styles.topHomeContainer}}>
               <TouchableOpacity style={styles.welcomeRoundButton} onPress = {toggleModal}>
-              <ImageBackground source={require('./assets/hb5.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+              <ImageBackground source={require('./assets/hb5.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={()=>navigation.navigate('downloadPage')}>
-              <ImageBackground source={require('./assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+              <ImageBackground source={require('./assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}></ImageBackground>
               </TouchableOpacity>
               </View>
             </View>
             <Modal isVisible={isModalVisible} hideModalContentWhileAnimating={true} useNativeDriver={true} animationIn="slideInDown" backdropTransitionInTiming={0} backdropColor="white" backdropOpacity={1}>
-              <SafeAreaView style={{flex:1, marginTop:"30%"}}>
+              <SafeAreaView style={{flex:1, marginTop:"10%"}}>
                 <Text style={{alignSelf:"flex-start", paddingVertical:10, fontSize:25,fontWeight:"bold"}}>Enter participant info</Text>
                 <Text style={{alignSelf:"flex-start", paddingVertical:10, fontSize:16}}>First Name:</Text>
                 <TextInput
@@ -105,10 +115,13 @@ const BeginPage = ({navigation}) => {
                   autoCorrect={false}
                   clearButtonMode="while-editing"
                   ref={ref_input2}
-                  onSubmitEditing={addParticipant}
+                  returnKeyType="next"
+                  onSubmitEditing={() =>ref.current.getFocus()}
                   enablesReturnKeyAutomatically = {true}
                 />
-                <View style={{flex:1, flexDirection: "row", alignItems:"baseline", justifyContent:"space-evenly"}}>
+                <Text style={{alignSelf:"flex-start", paddingBottom:10, fontSize:16}}>Hand size:</Text>
+                <HSDrop ref = {ref} onUpdate={onHSUpdate}></HSDrop>
+                <View style={{flex:1, flexDirection: "row", alignItems:"baseline", justifyContent:"space-evenly", marginTop:20}}>
                 <TouchableOpacity disabled={((textFN && textLN) ==""?true:false)} style={(textFN && textLN) ==""?{...styles.homeButtonDisabled, alignSelf:"center"}:{...styles.homeButton,alignSelf:"center"}} onPress={addParticipant}>
                   <Text>Register</Text>
                 </TouchableOpacity>
@@ -126,10 +139,12 @@ const LandingPage = ({route, navigation}) => {
   const { testSelected } = route.params;
   const [testMode, setTestMode] = useState('insert')
   const [participantID, setParticipantID] = useState(1)
+  const [posture, setPosture] = useState("Sitting")
   const [startTime, setStartTime] = useState("Select product")
   const [btnState, SetBtnState] = useState(true)
   const [productOpen, setProductOpen] = useState(false);
   const [productValue, setProductValue] = useState(null);
+  const [LRValue, setLRValue] = useState('Right');
   const [productItems, setProductItems] = useState([
     {label: 'No grip', value: 'No grip'},
     {label: 'Metal Ring', value: 'Metal Ring'},
@@ -140,6 +155,10 @@ const LandingPage = ({route, navigation}) => {
 
   const onTestUpdate = (testMode) => {
     setTestMode(testMode)
+  }
+
+  const onPostureUpdate = (posture) => {
+    setPosture(posture)
   }
 
   const onParticipantUpdate = (pid) => {
@@ -154,16 +173,16 @@ const LandingPage = ({route, navigation}) => {
           return () => clearInterval(toggle);
       }
       if(startTime==0 && testSelected != 'Typing'){
-          navigation.navigate(testSelected + 'Screen', {'product': productValue, 'device': Device.modelId, 'PID': participantID})
+          navigation.navigate(testSelected + 'Screen', {'product': productValue, 'device': Device.modelId, 'PID': participantID, 'posture': posture, 'hand': LRValue})
           setStartTime("Begin")
       }else if (startTime==0 && testSelected == 'Typing'){
-        navigation.navigate(testSelected + 'Screen', {'product': productValue, 'device': Device.modelId, 'testMode': testMode, 'PID':participantID })
+        navigation.navigate(testSelected + 'Screen', {'product': productValue, 'device': Device.modelId, 'testMode': testMode, 'PID':participantID, 'posture': posture, 'hand': LRValue})
         setStartTime("Begin")
       }
   })
   
-  return <View style={styles.container}>
-          <Text style={{marginTop:20, marginBottom:5, fontSize: 25, alignSelf:"flex-start", fontWeight:"bold", paddingHorizontal:20}}>Select test options</Text>
+  return <ScrollView contentContainerStyle={styles.TSContainer}>
+          <Text style={{marginTop:20, color:"#064663" ,marginBottom:5, fontSize: 25, alignSelf:"flex-start", fontWeight:"bold", paddingHorizontal:20}}>Select test options</Text>
           <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 15}}>
               <Text style={{fontSize:16, marginBottom: 8}}>Participant:</Text>
               <ParticipantDrop onUpdate={onParticipantUpdate}></ParticipantDrop>
@@ -171,11 +190,13 @@ const LandingPage = ({route, navigation}) => {
           <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex:10}}>
             <Text style={{fontSize:16, marginBottom: 8}}>Product Under Test:</Text>
             <DropDownPicker
-              zIndex={10}
-              zIndexInverse={1000}
+              zIndex={3000}
+              zIndexInverse={2000}
               open={productOpen}
               value={productValue}
               items={productItems}
+              dropDownDirection={"BOTTOM"}
+              style={{...styles.dropStyle}}
               setOpen={setProductOpen}
               setValue={setProductValue}
               placeholder="Select product"
@@ -187,19 +208,38 @@ const LandingPage = ({route, navigation}) => {
               textStyle = {{textAlign: 'left', fontSize:18}}
             />
           </View>
+
+          <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 9}}>
+              <Text style={{fontSize:16, marginBottom: 8}}>Select Test Posture:</Text>
+              <TPDrop onUpdate={onPostureUpdate}></TPDrop>
+          </View>
+          <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 8}}>
+              <Text style={{fontSize:16}}>Select Test Hand:</Text>
+          </View>
+          <ButtonToggleGroup
+              highlightBackgroundColor={'#064663'}
+              highlightTextColor={'white'}
+              inactiveBackgroundColor={'transparent'}
+              inactiveTextColor={'grey'}
+              values={['Right', 'Left']}
+              value={LRValue}
+              onSelect={val => setLRValue(val)}
+              textStyle={{fontSize:16, fontWeight:'bold'}}
+              style={{borderWidth:1, padding:4, marginHorizontal:20, borderRadius:8}}
+          />
           {testSelected == 'Typing' && 
             <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 5}}>
-              <Text style={{fontSize:16, marginBottom: 8}}>Select Test Mode</Text>
+              <Text style={{fontSize:16, marginBottom: 8}}>Select Test Mode:</Text>
               <TestTypeDrop onUpdate={onTestUpdate}></TestTypeDrop>
             </View>
           }
           <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 2}}>
               <Text style={{fontSize:16, marginBottom: 8}}>Device:</Text>
-              <View style={{borderWidth:1, borderRadius: 10, minWidth:"100%", height:50, justifyContent:"center", backgroundColor:"#EDEDED"}}>
+              <View style={{borderWidth:0, borderRadius: 10, minWidth:"100%", height:50, justifyContent:"center", backgroundColor:"#ededed", shadowColor: '#000', shadowOpacity: 0.4, shadowOffset: { width: 0, height: 1 }, shadowRadius: 3}}>
               <Text style={{ fontSize:18, padding: 10}}>{Device.modelId}</Text>
               </View>
           </View>
-          <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-between", flex:1, paddingHorizontal:20, marginTop:20, minWidth:"100%"}}>
+          <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-between", flex:1, paddingHorizontal:20, marginVertical:20, minWidth:"100%"}}>
             <TouchableOpacity disabled = {btnState} style={(btnState)?{...styles.homeButtonDisabled}:{...styles.homeButton}} onPress = {() => setStartTime(3)}>
               <Text>{startTime}</Text>
             </TouchableOpacity>
@@ -207,7 +247,7 @@ const LandingPage = ({route, navigation}) => {
               <Text>View Results</Text>
             </TouchableOpacity>
           </View>
-        </View> 
+        </ScrollView>
 }
 
 const Stack = createNativeStackNavigator();
@@ -234,7 +274,7 @@ export default function App() {
       //   "drop table if exists participants"
       // );
       tx.executeSql(
-        "create table if not exists summary (id integer primary key not null, device text, testType text, testProduct text, testMode text, testStatus boolean, pid integer);"
+        "create table if not exists summary (id integer primary key not null, device text, testType text, testProduct text, testMode text, testStatus boolean, pid integer, posture text, testHand text);"
       );
       tx.executeSql(
         "create table if not exists tapResult (id integer primary key not null, tid integer, xPos integer, yPos integer, rightClick boolean, timeTaken real);"
@@ -249,7 +289,7 @@ export default function App() {
         "create table if not exists typeResult (id integer primary key not null, tid integer, trialNumber integer , wpm real , accuracy real , rawwpm real, timeElapsed integer);"
       );
       tx.executeSql(
-        "create table if not exists participants (id integer primary key not null, firstName text, lastName text);"
+        "create table if not exists participants (id integer primary key not null, firstName text, lastName text, handSize text);"
       );
     });
   }, []);
@@ -289,13 +329,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent:"space-evenly",
   },
+  TSContainer: {
+    flexGrow:1,
+    backgroundColor:"#fff",
+    justifyContent:"space-evenly",
+  },
   input: {
-    height: 60,
+    height: 48,
     marginBottom:15,
-    borderWidth: 1,
     padding: 15,
     borderRadius: 10,
-    minWidth:"100%"
+    borderWidth:1,
+    borderColor:"rgba(0,0,0,0.2)",
+    minWidth:"100%",
   },
   homeButton: {
     alignItems: 'center',
@@ -362,5 +408,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 5,  
-  }
+  },
+  dropStyle: {borderWidth:0,    shadowColor: '#000',
+  shadowOpacity: 0.4,
+  shadowOffset: { width: 0, height: 1 },
+  shadowRadius: 3,}
 });

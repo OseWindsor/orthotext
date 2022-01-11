@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Dimensions  } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, ImageBackground  } from 'react-native';
 import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { Table, TableWrapper, Cell, Row, Rows, Col, Cols } from 'react-native-table-component';
 import {Database} from "../../Database.js"
@@ -34,6 +34,32 @@ export const swipeResultPage = (props) => {
         await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
     }
 
+    async function discardData(){
+        console.log('test')
+        await db.execute("update summary set testStatus = ? where id =?",[0,props.route.params.tid])
+        Alert.alert(
+            "Test Discarded",
+            "App will now navigate to home screen",
+            [
+              { text: "OK", onPress: () => navigation.navigate('Home')}
+            ]
+          );
+    }
+
+    const createTwoButtonAlert = () =>
+    Alert.alert(
+      "Discard Test",
+      "Are you sure you want to discard this test? This action cannot be reversed",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Confirm", onPress: discardData }
+      ]
+    );
+
     useEffect(() => {
         async function getData(){
             let colTrial = []
@@ -66,6 +92,8 @@ export const swipeResultPage = (props) => {
         getData()
     }, [props.route.params.tid]);
     return (
+        <View style={{flexGrow:1}}>
+        <View style={{flexGrow:1}}>
         <ScrollView style={{...styles.container}}>
             <View style={{margin: 7, alignItems: "center"}}>
                 <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary</Text>
@@ -117,18 +145,25 @@ export const swipeResultPage = (props) => {
                 </TableWrapper>
                 </Table>
             </View>
-            <View style={{alignItems: "center", margin: 15, marginBottom: 60}}>
-                <TouchableOpacity style={{...styles.roundButton}}>
-                    <Text>View Detailed Results</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={downloadData} style={{...styles.roundButton}}>
-                    <Text>Download Data</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress = {() => navigation.navigate('resultSelect')} style={{...styles.roundButton}}>
-                    <Text>View Another Result</Text>
-                </TouchableOpacity>
+            <View style={{alignItems: "center", margin: 15, marginBottom: 0, justifyContent:"space-evenly",flexDirection:"row"}}>
             </View>
         </ScrollView>
+        </View>
+        <View style={{...styles.bottomBar}}>
+        <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
+                <ImageBackground source={require('../../assets/hb2.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+                </TouchableOpacity>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
+                <ImageBackground source={require('../../assets/hb6.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+                </TouchableOpacity>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
+                <ImageBackground source={require('../../assets/hb4.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                  </ImageBackground>
+                </TouchableOpacity>
+        </View>
+        </View>
     )
 }
 
@@ -149,4 +184,24 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: '#d3d3d3',
     },
+    welcomeRoundButton: {
+        justifyContent: "center",
+        width: 55,
+        height:55,
+        backgroundColor: "white",
+        borderColor:"#064663",
+        borderWidth:0.3,
+        padding: 15,
+        borderRadius: 100,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 4,  
+      },
+      bottomBar: {
+        flexDirection:"row", justifyContent:"space-around", alignItems:"center", paddingVertical:10, borderTopWidth:0, backgroundColor:"white",shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 5
+      }
 });
