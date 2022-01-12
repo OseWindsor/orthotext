@@ -6,6 +6,9 @@
     },
     "preview": {
       "distribution": "internal",
+      "cache": {
+        "key": "Invalidate"
+      },
       "ios": {
         "image": "latest"
       }
