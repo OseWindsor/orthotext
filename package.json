@@ -18,7 +18,6 @@
     "expo-file-system": "~11.0.2",
     "expo-gl": "~10.2.0",
     "expo-linear-gradient": "~9.1.0",
-    "expo-modules-core": "^0.6.3",
     "expo-permissions": "^13.1.0",
     "expo-pixi": "^1.2.0",
     "expo-sensors": "^11.1.0",
