@@ -37,7 +37,7 @@ export const TapResult = (props) => {
 
     //function to run onMount
     useEffect(() => {
-
+        console.log(tid)
         let data = []
         async function generateData() {
             for(let i=0;i<100;i+=10){
@@ -89,7 +89,7 @@ export const TapResult = (props) => {
                     <Text style={{fontSize:20, paddingLeft: 15}}>Accuracy: {tid.params.tdata[0][1]}%</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Mean Reaction Time: {tid.params.tdata[1][1]}s</Text>
                 </View>
-                <View style={{backgroundColor: "green", width:"60%", height:'50%', alignItems:"flex-start", alignSelf: "flex-start", position:"relative", justifyContent:"flex-start"}}>
+                <View style={(tid.params.testHand=="Left")?{...styles.zoneLStyle}:{...styles.zoneRStyle}}>
                     <Text style={{fontSize:25, padding: 15, fontWeight:"bold"}}>Zone 1</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Accuracy: {tid.params.tdata[0][0]}%</Text>
                     <Text style={{fontSize:20, paddingLeft: 15}}>Mean Reaction Time: {tid.params.tdata[1][0]}s</Text>
@@ -130,4 +130,10 @@ export const TapResult = (props) => {
         height: 60,
         backgroundColor: '#d3d3d3',
     },
+    zoneLStyle:{
+        backgroundColor: "green", width:"60%", height:'50%', alignItems:"flex-start", position:"relative", justifyContent:"flex-start",alignSelf:"flex-end"
+    },
+    zoneRStyle:{
+        backgroundColor: "green", width:"60%", height:'50%', alignItems:"flex-start", position:"relative", justifyContent:"flex-start",alignSelf:"flex-start"
+    }
   });

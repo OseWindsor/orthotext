@@ -74,43 +74,56 @@ export const scrollResultPage = (props) => {
         getData()
     },[props.route.params.tid])
     return (
-        <ScrollView>
-            <View style={{margin: 7, alignItems: "center"}}>
-                <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
+        <View style={{flexGrow:1}}>
+            <View style={{flexGrow:1, minHeight:"100%"}}>
+                <ScrollView>
+                    <View style={{margin: 7, alignItems: "center"}}>
+                        <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
+                    </View>
+                    <View style={{ backgroundColor: "#fff", margin: 7, elevation: 13, borderWidth: 0, borderRadius: 10,...styles.shadowStyle}}>
+                        <Table borderStyle={{borderWidth: 0}} style={{paddingTop: 15, paddingLeft: 5}}>
+                            <Row data={tableHead} flexArr={[1, 2, 2]} style={styles.head} textStyle={styles.text}/>
+                            <TableWrapper style={styles.wrapper}>
+                                <Col data={tableTitle} style={styles.title} textStyle={styles.textTitle}/>
+                                <Rows data={tableData} flexArr={[2, 2]} style={styles.row} textStyle={styles.text}/>
+                            </TableWrapper>
+                        </Table>
+                    </View>
+                    <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
+                        <Text style = {{fontWeight:'bold'}}>Device Tested: {props.route.params.device}</Text>
+                    </View>
+                    <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
+                        <Text style={{fontWeight:'bold'}}>Product Tested: {props.route.params.product}</Text>
+                    </View>
+                    <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10, marginBottom:70}}>
+                        <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
+                    </View>
+                </ScrollView>
             </View>
-            <View style={{ backgroundColor: "#fff", margin: 7, elevation: 13, borderWidth: 1, borderRadius: 10}}>
-                <Table borderStyle={{borderWidth: 0}} style={{paddingTop: 15, paddingLeft: 5}}>
-                    <Row data={tableHead} flexArr={[1, 2, 2]} style={styles.head} textStyle={styles.text}/>
-                    <TableWrapper style={styles.wrapper}>
-                        <Col data={tableTitle} style={styles.title} textStyle={styles.textTitle}/>
-                        <Rows data={tableData} flexArr={[2, 2]} style={styles.row} textStyle={styles.text}/>
-                    </TableWrapper>
-                </Table>
-            </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style = {{fontWeight:'bold'}}>Device Tested: {props.route.params.device}</Text>
-            </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style={{fontWeight:'bold'}}>Product Tested: {props.route.params.product}</Text>
-            </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
-            </View>
-            <View style={{alignItems: "center", marginVertical: 15, flexDirection:"row", justifyContent:"space-evenly"}}>
+        <View style={{...styles.bottomBar}}>
+            <View style={{flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
                 <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
-                <ImageBackground source={require('../../assets/hb2.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+                <ImageBackground source={require('../../assets/hb2.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
                 </TouchableOpacity>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
-                <ImageBackground source={require('../../assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
-                <ImageBackground source={require('../../assets/hb4.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Search</Text>
             </View>
-        </ScrollView>
+            <View style={{flexDirection:"column", alignItems:"center",justifyContent:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
+                <ImageBackground source={require('../../assets/hb6.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Download</Text>
+            </View>
+            <View style={{flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
+                <ImageBackground source={require('../../assets/hb4.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Discard</Text>
+            </View>
+        </View>
+    </View>
     )
 }
 
@@ -134,15 +147,27 @@ const styles = StyleSheet.create({
     },
     welcomeRoundButton: {
         justifyContent: "center",
-        width: 70,
-        height:70,
-        backgroundColor: "#064663",
+        width: 40,
+        height:40,
+        backgroundColor: "white",
         borderColor:"#3C415C",
-        padding: 20,
+        padding: 10,
         borderRadius: 100,
         shadowColor: '#000',
-        shadowOpacity: 0.4,
+        shadowOpacity: 0.2,
         shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 7,  
+        shadowRadius: 3,  
       },
+      shadowStyle:{      shadowColor: '#000',
+      shadowOpacity: 0.4,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 7},
+      bottomBar: {
+        flexDirection:"row", justifyContent:"space-around", alignItems:"center", paddingVertical:10, borderTopWidth:0, backgroundColor:'rgba(6,70,99,0.8)',shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 5,
+        position:"absolute",
+        bottom:0,
+        width:"100%"},
   });

@@ -56,13 +56,32 @@ export const ExpButton = (props) => {
     const [backColor, setBackColor] = useState("orange")
     //function to handle correct button press
     let changePosition = arg1 => async () => {
-        console.log(xPos.length)
         let elapsedTime = (new Date() * 1) - startTime
+        let tapZone
+        if(testhand=='Left'){
+            console.log(parseFloat(xPos[position].right))
+            if(parseFloat(xPos[position].bottom)<45 && parseFloat(xPos[position].right)<45){
+                tapZone = 1
+                console.log("zone 1")
+            }else{
+                tapZone = 2
+                console.log("zone 2")
+            }
+        }else{
+            console.log(parseFloat(xPos[position].right))
+            if(parseFloat(xPos[position].bottom)<45 && parseFloat(xPos[position].right)>35){
+                tapZone = 1
+                console.log("zone 1")
+            }else{
+                tapZone = 2
+                console.log("zone 2")
+            }
+        }
         if(arg1 == 0){ //on accurate press condition
             //insert data to result table
-            await db.execute("insert into tapResult (tid, yPos, xPos, rightClick, timeTaken) values (?, ?, ?, ?, ?)", [tid, parseFloat(xPos[position].bottom), parseFloat(xPos[position].right), true, elapsedTime/1000])
+            await db.execute("insert into tapResult (tid, yPos, xPos, rightClick, timeTaken, tapZone) values (?, ?, ?, ?, ?, ?)", [tid, parseFloat(xPos[position].bottom), parseFloat(xPos[position].right), true, elapsedTime/1000,tapZone])
         }else{ //on inaccurate press condition
-            await db.execute("insert into tapResult (tid, yPos, xPos, rightClick, timeTaken) values (?, ?, ?, ?, ?)", [tid, parseFloat(xPos[position].bottom), parseFloat(xPos[position].right), false, elapsedTime/1000])
+            await db.execute("insert into tapResult (tid, yPos, xPos, rightClick, timeTaken, tapZone) values (?, ?, ?, ?, ?, ?)", [tid, parseFloat(xPos[position].bottom), parseFloat(xPos[position].right), false, elapsedTime/1000,tapZone])
         }
 
         //after db update remove element from positions array
@@ -79,7 +98,7 @@ export const ExpButton = (props) => {
                 { name: 'Home' },
                 {
                     name: 'resultPage',
-                    params:  {tid: tid, device: dev, product: prod, pid:pid}
+                    params:  {tid: tid, device: dev, product: prod, pid:pid, testhand:testhand}
                 },
                 ],
             })

@@ -25,7 +25,7 @@ export const resultPage = (props) => {
     let rts = []
 
     async function downloadData() {
-        let res = await db.execute("select id,xPos,yPos,rightClick,timeTaken  from tapResult where tid = ?",[props.route.params.tid])
+        let res = await db.execute("select id,xPos,yPos,rightClick,timeTaken,tapZone as Zone  from tapResult where tid = ?",[props.route.params.tid])
         const csv = json2csvParser.parse(res.rows);
         //console.log(csv);
         let prodNmae = props.route.params.product.replace(/\s/g, '');
@@ -65,10 +65,10 @@ export const resultPage = (props) => {
     useEffect(() => {
         async function getData(){
             //console.log(props.route.params.tid)
-            let rightCountZ1 = await db.execute("select count(rightClick) as rightCount from tapResult where tid = ? and rightClick = ?  and xPos < ? and yPos < ?", [props.route.params.tid, 1, 45, 45])
-            let timeTakenZ1 = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ? and xPos < ? and yPos < ?", [props.route.params.tid, 45, 45])
-            let rightCountZ2 = await db.execute("select count(rightClick) as rightCount from tapResult where tid = ? and rightClick = ? and (xPos > ? or yPos > ?)", [props.route.params.tid, 1, 45, 45])
-            let timeTakenZ2 = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ? and (xPos > ? or yPos > ?)", [props.route.params.tid, 45, 45])
+            let rightCountZ1 = await db.execute("select count(rightClick) as rightCount from tapResult where tid = ? and rightClick = ?  and tapZone = ?", [props.route.params.tid, 1, 1])
+            let timeTakenZ1 = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ? and tapZone = ?", [props.route.params.tid, 1])
+            let rightCountZ2 = await db.execute("select count(rightClick) as rightCount from tapResult where tid = ? and rightClick = ? and tapZone = ?", [props.route.params.tid, 1, 2])
+            let timeTakenZ2 = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ? and tapZone = ?", [props.route.params.tid, 2])
             let timeTakenOverall = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ?", [props.route.params.tid])
             let accZ1 = (((rightCountZ1.rows[0].rightCount)/30)*100).toFixed(2)
             let accZ2 = (((rightCountZ2.rows[0].rightCount)/70)*100).toFixed(2)
@@ -87,11 +87,13 @@ export const resultPage = (props) => {
     }, [props.route.params.tid]);
 
     return (
+      <View style={{flexGrow:1}}>
+      <View style={{flexGrow:1, minHeight:"100%"}}>
         <ScrollView contentContainerStyle={{...styles.container}}>
             <View style={{margin: 7, alignItems: "center"}}>
                 <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
             </View>
-            <View style={{ backgroundColor: "#fff", margin: 7, elevation: 13, borderWidth: 1, borderRadius: 10}}>
+            <View style={{ backgroundColor: "#fff", margin: 7, elevation: 13, borderWidth: 0, borderRadius: 10, ...styles.shadowStyle}}>
 
                 <Table borderStyle={{borderWidth: 0}} style={{paddingTop: 15, paddingLeft: 5}}>
                 <Row data={tableHead} flexArr={[2, 1, 1, 1]} style={styles.head} textStyle={styles.text}/>
@@ -100,36 +102,50 @@ export const resultPage = (props) => {
                     <Rows data={tableData} flexArr={[1, 1, 1]} style={styles.row} textStyle={styles.text}/>
                 </TableWrapper>
                 </Table>
-                <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                    <Text style = {{fontWeight:'bold'}}>Device Tested: {props.route.params.device}</Text>
-                </View>
-                <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                    <Text style={{fontWeight:'bold'}}>Product Tested: {props.route.params.product}</Text>
-                </View>
-                <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                    <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
-                </View>
             </View>
-
-            <View style={{alignItems: "center", marginTop: 15, flexDirection:"row", justifyContent:"space-evenly"}}>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('TapResult', {params: {tid: props.route.params.tid, tdata: tableData}})}>
-                <ImageBackground source={require('../assets/hb3.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
-                <ImageBackground source={require('../assets/hb2.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
-                <ImageBackground source={require('../assets/hb6.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
-                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
-                <ImageBackground source={require('../assets/hb4.png')} imageStyle={{tintColor:"white"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
-                </TouchableOpacity>
+            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
+                <Text style = {{fontWeight:'bold'}}>Device Tested: {props.route.params.device}</Text>
+            </View>
+            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
+                <Text style={{fontWeight:'bold'}}>Product Tested: {props.route.params.product}</Text>
+            </View>
+            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
+                <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
             </View>
         </ScrollView>
+        </View>
+        <View style={{...styles.bottomBar}}>
+          <View style={{flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('TapResult', {params: {tid: props.route.params.tid, tdata: tableData, testHand:props.route.params.testhand}})}>
+                <ImageBackground source={require('../assets/hb3.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Charts</Text>
+            </View>
+            <View style={{flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
+                <ImageBackground source={require('../assets/hb2.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Search</Text>
+            </View>
+            <View style={{flexDirection:"column", alignItems:"center",justifyContent:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
+                <ImageBackground source={require('../assets/hb6.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Download</Text>
+            </View>
+            <View style={{flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
+                <ImageBackground source={require('../assets/hb4.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
+                    </ImageBackground>
+                </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Discard</Text>
+            </View>
+        </View>
+      </View>
+
     )
 }
 
@@ -154,15 +170,28 @@ const styles = StyleSheet.create({
     welcomeRoundButton: {
 
         justifyContent: "center",
-        width: 70,
-        height:70,
-        backgroundColor: "#064663",
+        width: 40,
+        height:40,
+        backgroundColor: "#fff",
         borderColor:"#3C415C",
-        padding: 20,
+        padding: 10,
         borderRadius: 100,
         shadowColor: '#000',
-        shadowOpacity: 0.4,
+        shadowOpacity: 0.2,
         shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 7,  
+        shadowRadius: 4,  
       },
+      bottomBar: {
+        flexDirection:"row", justifyContent:"space-around", alignItems:"center", paddingVertical:10, borderTopWidth:0, backgroundColor:'rgba(6,70,99,0.8)',shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 5,
+        position:"absolute",
+        bottom:0,
+        width:"100%"
+      },
+      shadowStyle:{      shadowColor: '#000',
+      shadowOpacity: 0.4,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 7}
   });

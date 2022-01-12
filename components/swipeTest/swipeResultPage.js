@@ -93,13 +93,13 @@ export const swipeResultPage = (props) => {
     }, [props.route.params.tid]);
     return (
         <View style={{flexGrow:1}}>
-        <View style={{flexGrow:1}}>
+        <View style={{flexGrow:1, minHeight:"100%"}}>
         <ScrollView style={{...styles.container}}>
             <View style={{margin: 7, alignItems: "center"}}>
                 <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary</Text>
             </View>
             <View style={{flexDirection:"row", margin: 17, justifyContent: "space-around"}}>
-                <View style={{ backgroundColor: "#ececec", width:"45%", minHeight:200, elevation: 13, borderRadius: 20, justifyContent: "space-evenly", alignItems: "center"}}>
+                <View style={{ backgroundColor: "#fff", width:"45%", minHeight:200, elevation: 13, borderRadius: 20, justifyContent: "space-evenly", alignItems: "center",...styles.shadowStyle}}>
                     <Text style={{fontSize: 25, fontWeight:"bold"}}>Height</Text>
                     <Text style={{fontSize: 17, fontWeight:"bold"}}>Max</Text>
                     <Text>{sumWidth[0]?.maxXDP.toFixed(0)} DP / {sumWidth[0]?.maxXPX.toFixed(0)} PX</Text>
@@ -108,7 +108,7 @@ export const swipeResultPage = (props) => {
                     <Text style={{fontSize: 17, fontWeight:"bold"}}>Avg</Text>
                     <Text>{sumWidth[0]?.avgXDP.toFixed(0)} DP / {sumWidth[0]?.avgXPX.toFixed(0)} PX</Text>
                 </View>
-                <View style={{ backgroundColor: "#ececec", width:"45%", minHeight:200, elevation: 13, borderRadius: 20, justifyContent: "space-evenly", alignItems: "center"}}>
+                <View style={{ backgroundColor: "#fff", width:"45%", minHeight:200, elevation: 13, borderRadius: 20, justifyContent: "space-evenly", alignItems: "center",...styles.shadowStyle}}>
                     <Text style={{fontSize: 25, fontWeight:"bold"}}>Width</Text>
                     <Text style={{fontSize: 17, fontWeight:"bold"}}>Max</Text>
                     <Text>{sumHeight[0]?.maxYDP.toFixed(0)} DP / {sumHeight[0]?.maxYPX.toFixed(0)} PX</Text>
@@ -145,25 +145,34 @@ export const swipeResultPage = (props) => {
                 </TableWrapper>
                 </Table>
             </View>
-            <View style={{alignItems: "center", margin: 15, marginBottom: 0, justifyContent:"space-evenly",flexDirection:"row"}}>
+            <View style={{alignItems: "center", margin: 15, marginBottom: 70, justifyContent:"space-evenly",flexDirection:"row"}}>
             </View>
         </ScrollView>
         </View>
         <View style={{...styles.bottomBar}}>
-        <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
+            <View style={{flexDirection:"column", justifyContent:"center", alignItems:"center"}}>
+                <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={() => navigation.navigate('resultSelect')}>
                 <ImageBackground source={require('../../assets/hb2.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+                    </ImageBackground>
                 </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Search</Text>
+            </View>
+            <View style={{flexDirection:"column", alignItems:"center",justifyContent:"center"}}>
                 <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={downloadData}>
                 <ImageBackground source={require('../../assets/hb6.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+                    </ImageBackground>
                 </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Download</Text>
+            </View>
+            <View style={{flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
                 <TouchableOpacity style={{...styles.welcomeRoundButton}} onPress={createTwoButtonAlert}>
                 <ImageBackground source={require('../../assets/hb4.png')} imageStyle={{tintColor:"#064663"}} style={{width: '100%', height: '100%', opacity:1, position:"absolute", alignSelf:"center"}}>
-                  </ImageBackground>
+                    </ImageBackground>
                 </TouchableOpacity>
+                <Text style={{fontSize:11, fontWeight:"bold", color:"white"}}>Discard</Text>
+            </View>
         </View>
-        </View>
+    </View>
     )
 }
 
@@ -186,12 +195,12 @@ const styles = StyleSheet.create({
     },
     welcomeRoundButton: {
         justifyContent: "center",
-        width: 55,
-        height:55,
+        width: 40,
+        height:40,
         backgroundColor: "white",
         borderColor:"#064663",
         borderWidth:0.3,
-        padding: 15,
+        padding: 10,
         borderRadius: 100,
         shadowColor: '#000',
         shadowOpacity: 0.2,
@@ -199,9 +208,16 @@ const styles = StyleSheet.create({
         shadowRadius: 4,  
       },
       bottomBar: {
-        flexDirection:"row", justifyContent:"space-around", alignItems:"center", paddingVertical:10, borderTopWidth:0, backgroundColor:"white",shadowColor: '#000',
+        flexDirection:"row", justifyContent:"space-around", alignItems:"center", paddingVertical:10, borderTopWidth:0, backgroundColor:'rgba(6,70,99,0.8)',shadowColor: '#000',
         shadowOpacity: 0.5,
         shadowOffset: { width: 0, height: 1 },
-        shadowRadius: 5
-      }
+        shadowRadius: 5,
+        position:"absolute",
+        bottom:0,
+        width:"100%"
+      },
+      shadowStyle:{      shadowColor: '#000',
+      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 5}
 });

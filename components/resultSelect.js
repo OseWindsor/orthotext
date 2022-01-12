@@ -20,13 +20,14 @@ useEffect(()=>{
 },[])
 
 async function showFullResult(){
-  let res = await db.execute('select device, testProduct,pid from summary where id = ?',[props.id])
+  let res = await db.execute('select device, testProduct,pid,testHand from summary where id = ?',[props.id])
   console.log(res.rows)
   let prod = res.rows[0].testProduct
   let dev = res.rows[0].device
   let pid = res.rows[0].pid
+  let testHand = res.rows[0].testHand
   if(props.valueTest=='tapping'){
-    navigation.navigate('resultPage', {tid: props.id, device: dev, product: prod, pid: pid});
+    navigation.navigate('resultPage', {tid: props.id, device: dev, product: prod, pid: pid,testhand:testHand});
   }else if(props.valueTest=='swiping'){
     navigation.navigate('swipeResultPage', {tid: props.id, device: dev, product: prod, pid: pid});
   }else if(props.valueTest=='scrolling'){
@@ -110,7 +111,7 @@ export const resultSelect = (props) => {
     return (
       <View style={{flex:1, alignItems:"flex-start"}}>
       <View style = {{flexGrow:1, padding: 10, alignItems: 'center', zIndex: 10, position: 'relative', paddingHorizontal:20}}>
-        <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:25, fontWeight:"bold", marginTop:15}}>View Results</Text>
+        <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:25, fontWeight:"bold", marginTop:15, color:"#064663"}}>View Results</Text>
         <Text style = {{marginBottom: 10, alignSelf:"flex-start", fontSize:16}}>Select Test:</Text>
         <DropDownPicker
           open={openTest}
@@ -150,7 +151,7 @@ export const resultSelect = (props) => {
         </View>
       </View>
       {countLoop.length>0 && (
-        <Text style = {{marginBottom: 5, marginLeft:20,alignSelf:"flex-start", fontSize:25, fontWeight:"bold"}}>Results List</Text>
+        <Text style = {{marginBottom: 5, marginLeft:20,alignSelf:"flex-start", fontSize:25, fontWeight:"bold",color:"#064663"}}>Results List</Text>
         )
       }
       <ScrollView contentContainerStyle={{flexGrow:1, borderWidth:0, alignItems:"center", minWidth:"100%"}}>
