@@ -20,6 +20,7 @@ export const ExpButton = (props) => {
     //function to run onMount
     useEffect(() => {
         navigation.setOptions({
+            headerShown:false,
             headerLeft: () => (<View></View>),
             headerRight: () => (<View style={{flexDirection:"row"}}>
                 <Button onPress = {()=>navigation.goBack()} title = 'Quit' color = "#f11e"></Button>
@@ -53,7 +54,7 @@ export const ExpButton = (props) => {
 
     const [position, setPosition] = useState(0)
     const [startTime, setStartTime] = useState(new Date() * 1)
-    const [backColor, setBackColor] = useState("orange")
+    const [backColor, setBackColor] = useState("#0F4C75")
     //function to handle correct button press
     let changePosition = arg1 => async () => {
         let elapsedTime = (new Date() * 1) - startTime
@@ -107,12 +108,12 @@ export const ExpButton = (props) => {
             if(arg1 == 1){
                 setBackColor("#ff0000")
                 timer = setTimeout(function(){
-                    setBackColor("orange")
+                    setBackColor("#0F4C75")
                 }, 100);
             }else{
                 setBackColor("#00ff00")
                 timer = setTimeout(function(){
-                    setBackColor("orange")
+                    setBackColor("#0F4C75")
                 }, 100);
             }
             setStartTime(new Date() * 1)
@@ -125,10 +126,10 @@ export const ExpButton = (props) => {
 
          <View style={{...styles.container}}>
             <TouchableWithoutFeedback onPress = {changePosition(1)}>
-            <View style={styles.container}/>
+            <View style={styles.errorContainer}/>
             </TouchableWithoutFeedback>
             <TouchableOpacity onPress = {changePosition(0)} style={{...styles.roundButton, ...xPos[position], backgroundColor:backColor}}>
-                <Text>{xPos.length}</Text>
+                <Text style={{fontWeight:"bold",color:"white"}}>{xPos.length}</Text>
             </TouchableOpacity>
         </View>
 
@@ -144,9 +145,17 @@ export const ExpButton = (props) => {
         position: 'absolute',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 30,
+        borderRadius: 10,
         width: Dimensions.get('window').width * 0.2,
-        height: Dimensions.get('window').width * 0.2,
-        backgroundColor: 'orange',
+        height: Dimensions.get('window').height * 0.1,
+        backgroundColor: '#F5F5F5',
+        shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 7,
     },
+    errorContainer: {
+        flex: 1,
+        backgroundColor:"#DDDDDD"
+      },
   });

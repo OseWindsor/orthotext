@@ -15,14 +15,14 @@ export const scrollResultPage = (props) => {
     const route = useRoute();
     const navigation = useNavigation();
     const [participant, setParticipant] = useState(null)
-    const [tableHead, SetTableHead] = useState(["",'Avg Time Taken (s)', 'Accuracy (%)'])
+    const [tableHead, SetTableHead] = useState(["",'Avg Time Taken (s)', '1st Try Acc (%)'])
     const [tableData, setTableData] = useState([])
     const [tableTitle, setTableTitle] = useState(['0 deg','90 deg', '180 deg', '270 deg'])
     let col1 = []
     let col2 = []
 
     async function downloadData() {
-        let res = await db.execute("select id,xPos,yPos,alignment,trials,timeTaken from scrollResult where tid = ?",[props.route.params.tid])
+        let res = await db.execute("select id,xPos,yPos,alignment,trials,timeTaken,rightClick from scrollResult where tid = ?",[props.route.params.tid])
         const csv = json2csvParser.parse(res.rows);
         //console.log(csv);
         let prodNmae = props.route.params.product.replace(/\s/g, '');
@@ -61,7 +61,7 @@ export const scrollResultPage = (props) => {
 
     useEffect(() => {
         async function getData(){
-            let res = await db.execute("select alignment, sum(case when trials > 1 Then 0 else 1 end) as avgTrials, avg(timeTaken) as avgTimeTaken from scrollResult where tid = ? group by alignment",[props.route.params.tid])
+            let res = await db.execute("select alignment, sum(case when trials > 1 or rightClick == false Then 0 else 1 end) as avgTrials, avg(timeTaken) as avgTimeTaken from scrollResult where tid = ? group by alignment",[props.route.params.tid])
             res.rows.forEach(element => {
                 console.log(element.avgTrials)
                 col1.push([element.avgTimeTaken.toFixed(2),(element.avgTrials/10)*100])

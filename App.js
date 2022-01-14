@@ -239,7 +239,7 @@ const LandingPage = ({route, navigation}) => {
               <Text style={{ fontSize:18, padding: 10}}>{Device.modelId}</Text>
               </View>
           </View>
-          <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-between", flex:1, paddingHorizontal:20, marginVertical:20, minWidth:"100%"}}>
+          <View style={{flexDirection:"row", alignItems:"flex-start", justifyContent:"space-evenly", flex:1, paddingHorizontal:20, marginVertical:20, minWidth:"100%"}}>
             <TouchableOpacity disabled = {btnState} style={(btnState)?{...styles.homeButtonDisabled}:{...styles.homeButton}} onPress = {() => setStartTime(3)}>
               <Text>{startTime}</Text>
             </TouchableOpacity>
@@ -283,7 +283,7 @@ export default function App() {
         "create table if not exists swipeResult (id integer primary key not null, tid integer, xDP real, yDP real, xPX integer, yPX integer, trialNumber integer, base64img text);"
       );
       tx.executeSql(
-        "create table if not exists scrollResult (id integer primary key not null, tid integer, xPos integer, yPos integer, alignment integer, trials integer, timeTaken real);"
+        "create table if not exists scrollResult (id integer primary key not null, tid integer, xPos integer, yPos integer, alignment integer, trials integer, timeTaken real, rightClick boolean);"
       );
       tx.executeSql(
         "create table if not exists typeResult (id integer primary key not null, tid integer, trialNumber integer , wpm real , accuracy real , rawwpm real, timeElapsed integer);"

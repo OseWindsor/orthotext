@@ -20,7 +20,7 @@ export const SwipeCanvas = (props) => {
     let pid = route.params.PID
     let posture = route.params.posture
     let testHand = route.params.hand
-    const style = `.m-signature-pad {box-shadow: none; border: none; } 
+    const style = `.m-signature-pad {box-shadow: none;margin-left: 0px;margin-top:0px } 
     .m-signature-pad--body {border: none;}
     body,html {
     width: 100%; height: 100%;}`;
@@ -62,7 +62,6 @@ export const SwipeCanvas = (props) => {
       }, (error) => {
         console.error(`Couldn't get the image size: ${error.message}`);
       });
-      setTrialState(false)
       //ref.current.clearSignature()
       console.log(trialCount)
       if(trialCount==9){
@@ -94,6 +93,7 @@ export const SwipeCanvas = (props) => {
   
     // Called after end of stroke
     const handleEnd = () => {
+      setTrialState(false)
       ref.current.getData()
       ref.current.readSignature()
     };
@@ -101,6 +101,7 @@ export const SwipeCanvas = (props) => {
     // Called after ref.current.getData()
     async function handleData(data){
       data = JSON.parse(data);
+      //console.log(data)
       var minX = Math.min.apply(null, data[0].points.map(function(a){return a.x;}))
          ,maxX = Math.max.apply(null, data[0].points.map(function(a){return a.x;}))
       var minY = Math.min.apply(null, data[0].points.map(function(a){return a.y;}))

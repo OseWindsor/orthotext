@@ -28,7 +28,9 @@ export const TapResult = (props) => {
 
     useEffect(() => {
         navigation.setOptions({
+            headerShown:false,
             headerRight: () => (<View style={{flexDirection:"row"}}>
+                
                 <Button onPress={toggleZones} title = {BTitle}></Button>
                 <Button onPress={toggleModal} title = "LEGEND"></Button>
                 </View>)
@@ -108,9 +110,9 @@ export const TapResult = (props) => {
         position: 'absolute',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 30,
+        borderRadius: 10,
         width: Dimensions.get('window').width * 0.2,
-        height: Dimensions.get('window').width * 0.2,
+        height: Dimensions.get('window').height * 0.1,
     },
     legendButton: {
         margin: 5,
