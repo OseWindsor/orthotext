@@ -87,7 +87,7 @@ export const ExpScroll = (props) => {
                     { name: 'Home' },
                     {
                         name: 'scrollResultPage',
-                        params:  {tid: tid, device: dev, product: prod, pid: pid}
+                        params:  {tid: tid, device: dev, product: prod, pid: pid, posture:posture,testHand:testHand}
                     },
                     ],
                 })

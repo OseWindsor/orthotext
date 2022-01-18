@@ -181,7 +181,7 @@ const LandingPage = ({route, navigation}) => {
       }
   })
   
-  return <ScrollView contentContainerStyle={styles.TSContainer}>
+  return <ScrollView pointerEvents={startTime=='Select product' || startTime=='Begin'?"auto":"none"}  contentContainerStyle={styles.TSContainer}>
           <Text style={{marginTop:20, color:"#064663" ,marginBottom:5, fontSize: 25, alignSelf:"flex-start", fontWeight:"bold", paddingHorizontal:20}}>Select test options</Text>
           <View style = {{padding: 10, alignItems: "left", paddingHorizontal: 20, zIndex: 15}}>
               <Text style={{fontSize:16, marginBottom: 8}}>Participant:</Text>

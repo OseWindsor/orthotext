@@ -99,7 +99,7 @@ export const ExpButton = (props) => {
                 { name: 'Home' },
                 {
                     name: 'resultPage',
-                    params:  {tid: tid, device: dev, product: prod, pid:pid, testhand:testhand}
+                    params:  {tid: tid, device: dev, product: prod, pid:pid, testhand:testhand,posture:posture}
                 },
                 ],
             })

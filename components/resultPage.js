@@ -30,7 +30,7 @@ export const resultPage = (props) => {
         //console.log(csv);
         let prodNmae = props.route.params.product.replace(/\s/g, '');
         let partName = participant.replace(/\s/g, '');
-        let filename = 'tapResult_id_' + props.route.params.tid + '_' + props.route.params.device + '_' + prodNmae + '_' + partName + '.csv'; // or some other way to generate filename
+        let filename = 'tapResult_id_' + props.route.params.tid + '_' + props.route.params.device + '_' + prodNmae + '_' + partName + '_' + props.route.params.posture + '_' + props.route.params.testhand + '.csv'; // or some other way to generate filename
         let filepath = `${FileSystem.documentDirectory}/${filename}`;
         await FileSystem.writeAsStringAsync(filepath, csv);
         await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
@@ -103,14 +103,44 @@ export const resultPage = (props) => {
                 </TableWrapper>
                 </Table>
             </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style = {{fontWeight:'bold'}}>Device Tested: {props.route.params.device}</Text>
-            </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style={{fontWeight:'bold'}}>Product Tested: {props.route.params.product}</Text>
-            </View>
-            <View style ={{alignItems: 'center', borderWidth: 1, borderRadius:10, padding: 10, margin: 10}}>
-                <Text style={{fontWeight:'bold'}}>Participant: {participant}</Text>
+            {/* info cards */}
+            <View style={{flexDirection:"row", justifyContent:"space-evenly",flexWrap:"wrap"}}>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Test ID</Text>
+                    <View style={{flexGrow:1, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.tid}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Device Tested</Text>
+                    <View style={{flexGrow:1, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.device}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Participant</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{participant}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Product Tested</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.product}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Posture</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.posture}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Test Hand</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.testhand}</Text>
+                    </View>
+                </View>
             </View>
         </ScrollView>
         </View>

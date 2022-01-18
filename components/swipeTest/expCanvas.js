@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Button, SafeAreaView, View, Image, Text, TextPropTypes, TouchableHighlight } from 'react-native';
+import { StyleSheet, TouchableOpacity, Button, Alert, View, Image, Text, TextPropTypes, TouchableHighlight } from 'react-native';
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import {Database} from "../../Database.js"
 import SignatureScreen from "react-native-signature-canvas";
@@ -29,6 +29,7 @@ export const SwipeCanvas = (props) => {
     useEffect(() => {
       navigation.setOptions({
         headerShown:false,
+        gestureEnabled:false,
         headerLeft: () => (<View></View>),
         headerRight: () => (<View style={{flexDirection:"row"}}>
             <Button onPress = {()=>navigation.goBack()} title = 'Quit' color = "#f11e"></Button>
@@ -43,6 +44,20 @@ export const SwipeCanvas = (props) => {
       }
       writeData()
     },[])
+
+    const createTwoButtonAlert = () =>
+    Alert.alert(
+      "Quit Test",
+      "Are you sure you want to discard this test and quit?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Quit", onPress: navigation.goBack }
+      ]
+    );
 
     function handleNext(){
       setTrialCount(trialCount+1)
@@ -73,7 +88,7 @@ export const SwipeCanvas = (props) => {
               { name: 'Home' },
               {
                   name: 'swipeResultPage',
-                  params:  {tid: tid, device: dev, product: prod, pid:pid}
+                  params:  {tid: tid, device: dev, product: prod, pid:pid,posture:posture,testHand,testHand}
               },
               ],
           })
@@ -129,10 +144,15 @@ export const SwipeCanvas = (props) => {
         webStyle={style} 
       />
       </View>
-      <View style={(trialState)?{...styles.viewDisabled}:{...styles.viewDisabled}}>
+      <View style={(trialState)?{...styles.viewDisabled}:{...styles.viewEnabled}}>
         <TouchableOpacity disabled = {trialState==false?false:true} style={(trialState)?{...styles.disabledNextButton}:{...styles.nextButton}} onPress={handleNext}>
           <Text>{trialState==false && trialCount < 9 ?'Next trial':'Swipe'}</Text>
         </TouchableOpacity>
+        {trialState==false &&
+        <TouchableOpacity style={(trialState)?{...styles.disabledNextButton}:{...styles.nextButton}} onPress={createTwoButtonAlert}>
+          <Text>Quit</Text>
+        </TouchableOpacity>
+        }
       </View>
       </View>
 
@@ -150,7 +170,7 @@ const styles = StyleSheet.create({
         zIndex:10,
         padding: 5,
         borderRadius: 20,
-        width:"100%"
+        width:"20%"
       },
       disabledNextButton: {
         alignItems: 'center',
@@ -163,6 +183,6 @@ const styles = StyleSheet.create({
         width:"100%",
         borderRadius: 20,
       },
-      viewDisabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "25%", flexDirection:"row", justifyContent:"space-around"},
-
+      viewDisabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "20%", flexDirection:"row", justifyContent:"center"},
+      viewEnabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "100%", flexDirection:"row", justifyContent:"space-evenly"},
  }); 

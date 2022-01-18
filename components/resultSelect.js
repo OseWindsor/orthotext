@@ -20,21 +20,22 @@ useEffect(()=>{
 },[])
 
 async function showFullResult(){
-  let res = await db.execute('select device, testProduct,pid,testHand from summary where id = ?',[props.id])
+  let res = await db.execute('select device, testProduct,pid,testHand,posture from summary where id = ?',[props.id])
   console.log(res.rows)
   let prod = res.rows[0].testProduct
   let dev = res.rows[0].device
   let pid = res.rows[0].pid
   let testHand = res.rows[0].testHand
+  let posture = res.rows[0].posture
   if(props.valueTest=='tapping'){
-    navigation.navigate('resultPage', {tid: props.id, device: dev, product: prod, pid: pid,testhand:testHand});
+    navigation.navigate('resultPage', {tid: props.id, device: dev, product: prod, pid: pid,testhand:testHand,posture:posture});
   }else if(props.valueTest=='swiping'){
-    navigation.navigate('swipeResultPage', {tid: props.id, device: dev, product: prod, pid: pid});
+    navigation.navigate('swipeResultPage', {tid: props.id, device: dev, product: prod, pid: pid,testHand:testHand,posture:posture});
   }else if(props.valueTest=='scrolling'){
     console.log(props.id)
-    navigation.navigate('scrollResultPage', {tid: props.id, device: dev, product: prod, pid: pid});
+    navigation.navigate('scrollResultPage', {tid: props.id, device: dev, product: prod, pid: pid,testHand:testHand,posture:posture});
   }else{
-    navigation.navigate('typeResultPage', {tid: props.id, device: dev, product: prod, pid: pid});
+    navigation.navigate('typeResultPage', {tid: props.id, device: dev, product: prod, pid: pid,testHand:testHand,posture:posture});
   }
   
 }

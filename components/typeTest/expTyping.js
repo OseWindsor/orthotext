@@ -56,7 +56,7 @@ export const ExpType = (props) => {
           { name: 'Home' },
           {
               name: 'typeResultPage',
-              params:  {tid: tid, device: dev, product: prod, pid: pid}
+              params:  {tid: tid, device: dev, product: prod, pid: pid,testHand:testHand,posture:posture}
           },
           ],
       })
