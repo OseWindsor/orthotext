@@ -4,11 +4,11 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 export const TestTypeDrop = ({onUpdate }) => {
     const [testTypeOpen, setTestTypeOpen] = useState(false);
-    const [testTypeValue, setTestTypeValue] = useState('insert');
+    const [testTypeValue, setTestTypeValue] = useState('noDelete');
     const [testTypes, setTestTypes] = useState([
-      {label: 'Insert', value: 'insert'},
-      {label: 'Skip - Allow Delete', value: 'skip'},
       {label: 'Skip - No Delete', value: 'noDelete'},
+      {label: 'Insert', value: 'insert'},
+      {label: 'Skip - Allow Delete', value: 'skip'}
     ]);
 
     const handleOnClick = () => {

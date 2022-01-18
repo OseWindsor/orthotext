@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, TouchableWithoutFeedback, Dimensions, Alert  } from 'react-native';
+import { StyleSheet, SafeAreaView, Text, View, TouchableOpacity, TouchableWithoutFeedback, Share, Alert  } from 'react-native';
 import Modal from "react-native-modal";
 import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -45,7 +45,23 @@ export const downloadPage = (props) => {
             let filename = 'participants.csv'; // or some other way to generate filename
             let filepath = `${FileSystem.documentDirectory}/${filename}`;
             await FileSystem.writeAsStringAsync(filepath, csv);
-            await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            try {
+                const result = await Share.share({
+                url:filepath
+                });
+                if (result.action === Share.sharedAction) {
+                if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                    Alert.alert("File saved to device")
+                } else {
+                    Alert.alert("File Shared")
+                }
+                } else if (result.action === Share.dismissedAction) {
+                    Alert.alert("Download dismissed")
+                }
+            } catch (error) {
+                alert(error.message);
+            }
         }else{
             Alert.alert('No data!', 'No data available yet for download. Complete a test and check back', [
                 {
@@ -66,7 +82,23 @@ export const downloadPage = (props) => {
             let filename = 'summary.csv'; // or some other way to generate filename
             let filepath = `${FileSystem.documentDirectory}/${filename}`;
             await FileSystem.writeAsStringAsync(filepath, csv);
-            await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            try {
+                const result = await Share.share({
+                url:filepath
+                });
+                if (result.action === Share.sharedAction) {
+                if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                    Alert.alert("File saved to device")
+                } else {
+                    Alert.alert("File Shared")
+                }
+                } else if (result.action === Share.dismissedAction) {
+                    Alert.alert("Download dismissed")
+                }
+            } catch (error) {
+                alert(error.message);
+            }
         }else{
             Alert.alert('No data!', 'No data available yet for download. Complete a test and check back', [
                 {
@@ -146,7 +178,23 @@ export const downloadPage = (props) => {
             let filename = testValue + '_testData.csv'; // or some other way to generate filename
             let filepath = `${FileSystem.documentDirectory}/${filename}`;
             await FileSystem.writeAsStringAsync(filepath, csv);
-            await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            try {
+                const result = await Share.share({
+                url:filepath
+                });
+                if (result.action === Share.sharedAction) {
+                if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                    Alert.alert("File saved to device")
+                } else {
+                    Alert.alert("File Shared")
+                }
+                } else if (result.action === Share.dismissedAction) {
+                    Alert.alert("Download dismissed")
+                }
+            } catch (error) {
+                alert(error.message);
+            }
         }else{
             Alert.alert('No test selected', 'A test must be selected to download data', [
                 {

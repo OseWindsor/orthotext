@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Alert, ScrollView  } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Alert, ScrollView,Share  } from 'react-native';
 import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { Table, TableWrapper, Row, Rows, Col } from 'react-native-table-component';
 import {Database} from "../Database"
@@ -33,7 +33,23 @@ export const resultPage = (props) => {
         let filename = 'tapResult_id_' + props.route.params.tid + '_' + props.route.params.device + '_' + prodNmae + '_' + partName + '_' + props.route.params.posture + '_' + props.route.params.testhand + '.csv'; // or some other way to generate filename
         let filepath = `${FileSystem.documentDirectory}/${filename}`;
         await FileSystem.writeAsStringAsync(filepath, csv);
-        await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+        //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+        try {
+            const result = await Share.share({
+                url:filepath
+            });
+            if (result.action === Share.sharedAction) {
+                if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                Alert.alert("File saved to device")
+                } else {
+                Alert.alert("File Shared")
+                }
+            } else if (result.action === Share.dismissedAction) {
+                Alert.alert("Download dismissed")
+            }
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
     async function discardData(){

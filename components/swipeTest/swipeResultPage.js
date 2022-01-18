@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, ImageBackground  } from 'react-native';
-import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, ImageBackground,Share,Animated  } from 'react-native';
+import { useRef, useNavigation, useRoute } from '@react-navigation/native';
 import { Table, TableWrapper, Cell, Row, Rows, Col, Cols } from 'react-native-table-component';
 import {Database} from "../../Database.js"
 const { Parser } = require('json2csv');
@@ -31,7 +31,24 @@ export const swipeResultPage = (props) => {
         let filename = 'swipeResult_id' + props.route.params.tid + '_' + props.route.params.device + '_' + prodNmae + '_' + partName + '_' + props.route.params.posture + '_' + props.route.params.testHand +  '.csv';
         let filepath = `${FileSystem.documentDirectory}/${filename}`;
         await FileSystem.writeAsStringAsync(filepath, csv);
-        await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+        //await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+        try {
+            const result = await Share.share({
+              url:filepath
+            });
+            if (result.action === Share.sharedAction) {
+              if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                Alert.alert("File saved to device")
+              } else {
+                Alert.alert("File Shared")
+              }
+            } else if (result.action === Share.dismissedAction) {
+                Alert.alert("Download dismissed")
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+        
     }
 
     async function discardData(){
@@ -203,6 +220,7 @@ export const swipeResultPage = (props) => {
             </View>
         </View>
     </View>
+
     )
 }
 
