@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions, Alert  } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, Button, TouchableWithoutFeedback, Dimensions, Alert  } from 'react-native';
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import RNSwipeVerify from '../swipeVerify'
 import {Database} from "../../Database.js"
@@ -45,6 +45,7 @@ export const ExpScroll = (props) => {
         }
         writeData()
         console.log(pid)
+        StatusBar.setHidden(true)
     },[])
 
     const createTwoButtonAlert = () =>
@@ -64,6 +65,7 @@ export const ExpScroll = (props) => {
     //cleanup to clear timeouts on component unmount
     useEffect(() => {
         return () => {
+            StatusBar.setHidden(false,'slide')
             clearTimeout(timer);
             clearInterval(interval)
             };

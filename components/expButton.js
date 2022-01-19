@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions  } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions,StatusBar  } from 'react-native';
 import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import {Database} from "../Database"
 
@@ -35,6 +35,7 @@ export const ExpButton = (props) => {
             console.log(res1)
         }
         writeData()
+        StatusBar.setHidden(true)
 
         //generate position data and set to array
         for(let i=0;i<100;i+=10){
@@ -48,6 +49,7 @@ export const ExpButton = (props) => {
     //cleanup to clear timeouts on component unmount
     useEffect(() => {
         return () => {
+            StatusBar.setHidden(false,'slide')
             clearTimeout(timer);
           };
     },[])

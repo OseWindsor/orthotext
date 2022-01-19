@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, Button, Alert, View, Image, Text, TextPropTypes, TouchableHighlight } from 'react-native';
+import { StyleSheet, TouchableOpacity, Button, Alert, View, Image, Text, StatusBar, TouchableHighlight } from 'react-native';
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import {Database} from "../../Database.js"
 import SignatureScreen from "react-native-signature-canvas";
@@ -43,6 +43,11 @@ export const SwipeCanvas = (props) => {
         //console.log(res1)
       }
       writeData()
+      StatusBar.setHidden(true)
+      
+      return () => {
+        StatusBar.setHidden(false,'slide')
+      };
     },[])
 
     const createTwoButtonAlert = () =>
