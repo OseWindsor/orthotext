@@ -137,7 +137,7 @@ const BeginPage = ({navigation}) => {
 //Landing screen function - loads after a test is selected
 const LandingPage = ({route, navigation}) => {
   const { testSelected } = route.params;
-  const [testMode, setTestMode] = useState('insert')
+  const [testMode, setTestMode] = useState('noDelete')
   const [participantID, setParticipantID] = useState(1)
   const [posture, setPosture] = useState("Sitting")
   const [startTime, setStartTime] = useState("Select product")

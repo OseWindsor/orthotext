@@ -6,6 +6,8 @@ import SignatureScreen from "react-native-signature-canvas";
 
 const db = new Database("result.db");
 let tid = 0;
+let timer
+let interval
 
 export const SwipeCanvas = (props) => {
 
@@ -15,6 +17,7 @@ export const SwipeCanvas = (props) => {
     const navigation = useNavigation();
     const [trialCount, setTrialCount] = useState(0)
     const [trialState, setTrialState] = useState(true)
+    const [countdown,setCountdown] = useState(0)
     let prod = route.params.product
     let dev = route.params.device
     let pid = route.params.PID
@@ -65,6 +68,8 @@ export const SwipeCanvas = (props) => {
     );
 
     function handleNext(){
+      clearInterval(interval)
+      clearTimeout(timer)
       setTrialCount(trialCount+1)
       ref.current.clearSignature()
       setTrialState(true)
@@ -113,6 +118,7 @@ export const SwipeCanvas = (props) => {
   
     // Called after end of stroke
     const handleEnd = () => {
+      setCountdown(5)
       setTrialState(false)
       ref.current.getData()
       ref.current.readSignature()
@@ -128,6 +134,27 @@ export const SwipeCanvas = (props) => {
          ,maxY = Math.max.apply(null, data[0].points.map(function(a){return a.y;}))
          await db.execute("insert into swipeResult (tid, yDP, xDP, trialNumber) values (?,?,?,?)",[tid, maxX-minX, maxY-minY, trialCount])
     };
+
+    useEffect(() => {
+      if(trialState==false && trialCount < 9){
+        interval = setInterval(function(){
+          if(countdown>-1){
+              setCountdown(countdown => countdown-1)
+          }
+        }, 1000)
+        timer = setTimeout(function(){
+          handleNext()
+        }, 5000);
+      }
+    },[trialState])
+
+    //cleanup to clear timeouts on component unmount
+    useEffect(() => {
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval)
+            };
+    },[])
   
     return (
 
@@ -159,6 +186,11 @@ export const SwipeCanvas = (props) => {
         </TouchableOpacity>
         }
       </View>
+      {trialState==false && trialCount<9 &&
+        <View style={{position:"absolute", bottom: "7%", zIndex: 30,alignSelf:"center",height:50,justifyContent:"center"}}>
+          <Text>Next trial in {countdown}s</Text>
+        </View>
+      }
       </View>
 
     );
@@ -189,5 +221,5 @@ const styles = StyleSheet.create({
         borderRadius: 20,
       },
       viewDisabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "20%", flexDirection:"row", justifyContent:"center"},
-      viewEnabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "100%", flexDirection:"row", justifyContent:"space-evenly"},
+      viewEnabled:{alignSelf:"center", position: "absolute", bottom: "7%", zIndex: 15, width: "100%", flexDirection:"row", justifyContent:"space-around",height:50},
  }); 
