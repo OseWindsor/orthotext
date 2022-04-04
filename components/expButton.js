@@ -30,7 +30,7 @@ export const ExpButton = (props) => {
         //function to write testid data to db
         async function writeData() {
             console.log(typeof prod)
-            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid, posture, testhand])
+            const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid, posture, testhand])
             tid = res1.insertId
             console.log(res1)
         }
@@ -38,12 +38,13 @@ export const ExpButton = (props) => {
         StatusBar.setHidden(true)
 
         //generate position data and set to array
-        for(let i=0;i<100;i+=10){
-            for(let j=0;j<100;j+=20){
+        for(let j=0;j<100;j+=25){
+            for(let i=90;i>=0;i-=10){
                 data.push({bottom: String(i) + "%", right: String(j) + "%"})
             }
         }
-        return setXPos([...data , ...data]);
+        console.log(data)
+        return setXPos([...data]);
     },[])
 
     //cleanup to clear timeouts on component unmount
@@ -63,7 +64,7 @@ export const ExpButton = (props) => {
         let tapZone
         if(testhand=='Left'){
             console.log(parseFloat(xPos[position].right))
-            if(parseFloat(xPos[position].bottom)<45 && parseFloat(xPos[position].right)<45){
+            if(parseFloat(xPos[position].right)>45){
                 tapZone = 1
                 console.log("zone 1")
             }else{
@@ -72,7 +73,7 @@ export const ExpButton = (props) => {
             }
         }else{
             console.log(parseFloat(xPos[position].right))
-            if(parseFloat(xPos[position].bottom)<45 && parseFloat(xPos[position].right)>35){
+            if(parseFloat(xPos[position].right)<45){
                 tapZone = 1
                 console.log("zone 1")
             }else{
@@ -119,8 +120,13 @@ export const ExpButton = (props) => {
                 }, 100);
             }
             setStartTime(new Date() * 1)
-            let randIndex = Math.floor(Math.random() * xPos.length)
-            setPosition(randIndex)
+            if(xPos.length>20){
+                let randIndex = Math.floor(Math.random() * (xPos.length-20))
+                setPosition(randIndex)
+            }else{
+                let randIndex = Math.floor(Math.random() * xPos.length)
+                setPosition(randIndex)
+            }
         }
     }
 
@@ -148,7 +154,7 @@ export const ExpButton = (props) => {
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-        width: Dimensions.get('window').width * 0.2,
+        width: Dimensions.get('window').width * 0.25,
         height: Dimensions.get('window').height * 0.1,
         backgroundColor: '#F5F5F5',
         shadowColor: '#000',

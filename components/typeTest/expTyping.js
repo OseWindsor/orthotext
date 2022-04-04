@@ -66,14 +66,14 @@ export const ExpType = (props) => {
   //initialize values on first render
   React.useEffect(() => {
     async function writeData() {
-      const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, testMode, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"typing",testType,pid,posture,testHand])
+      const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, testMode, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"typing",testType,pid,posture,testHand])
       tid = res1.insertId
-      console.log(tid)
+      console.log(await db.execute("select * from summary where id = ?",[tid]))
     }
     writeData()
     trialCount = 0
     arr = [];
-    while(arr.length < 5){
+    while(arr.length < 3){
         var r = Math.floor(Math.random() * (50 - 1 + 1) + 1)
         if(arr.indexOf(r) === -1) arr.push(r);
     }
@@ -162,7 +162,7 @@ export const ExpType = (props) => {
         if(currentIndex+1==sentence.length && (testType == 'noDelete' || testType == 'skip')){
           clearInterval(timer)
           recordData()
-          if(trialCount == 5){
+          if(trialCount == 3){
             updateStatus()
             navigateHome()
           }else{
@@ -173,7 +173,7 @@ export const ExpType = (props) => {
         }else if(currentIndex-wrongIndexes.length+1==sentence.length){
           clearInterval(timer)
           recordData()
-          if(trialCount == 5){
+          if(trialCount == 3){
             updateStatus()
             navigateHome()
           }else{
@@ -279,7 +279,7 @@ export const ExpType = (props) => {
         <View style = {{flexDirection: "row", height: "10%", justifyContent: "space-evenly", alignItems: "stretch", marginTop: 20}}>
           <View style={{borderWidth: 1, width: "30%", alignItems: "center", justifyContent: "space-evenly", borderRadius: 20, backgroundColor: "white"}}>
             <Text style={{fontSize: 20, fontWeight: "bold"}}>Trial</Text>
-            <Text>{trialState} of 5</Text>
+            <Text>{trialState} of 3</Text>
           </View>
           <View style={{borderWidth: 1, width: "30%", alignItems: "center", justifyContent: "space-evenly", borderRadius: 20, backgroundColor: "white"}}>
             <Text style={{fontSize: 20, fontWeight: "bold"}}>Accuracy</Text>

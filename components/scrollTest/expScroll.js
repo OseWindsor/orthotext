@@ -40,7 +40,7 @@ export const ExpScroll = (props) => {
         })
         //function to write testid data to db
         async function writeData() {
-            const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture, testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid,posture,testHand])
+            const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid,posture,testHand])
             tid = res1.insertId
         }
         writeData()

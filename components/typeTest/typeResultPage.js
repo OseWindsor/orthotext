@@ -16,8 +16,8 @@ export const typeResultPage = (props) => {
     const navigation = useNavigation();
     const [participant, setParticipant] = useState(null)
     const [tableHead, SetTableHead] = useState(["",'Words per minute', 'Accuracy'])
-    const [tableData, setTableData] = useState([['50','50'],['50','50'],['50','50'],['50','50'],['50','50']])
-    const [tableTitle, setTableTitle] = useState(['Trial 1','Trial 2', 'Trial 3', 'Trial 4', 'Trial 5'])
+    const [tableData, setTableData] = useState([['50','50'],['50','50'],['50','50']])
+    const [tableTitle, setTableTitle] = useState(['Trial 1','Trial 2', 'Trial 3'])
     let col1 = []
 
     //function to download data as csv
@@ -79,7 +79,7 @@ export const typeResultPage = (props) => {
 
     useEffect(() => {
         async function getData(){
-            for(let i=1;i<6;i+=1){
+            for(let i=1;i<4;i+=1){
                 let res = await db.execute("select * from typeResult where tid=? and trialNumber = ? order by timeElapsed desc limit 1",[props.route.params.tid,i])
                 console.log(res.rows)
                 col1.push([res.rows[0].wpm,res.rows[0].accuracy])

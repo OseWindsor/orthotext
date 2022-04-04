@@ -42,11 +42,11 @@ export const TapResult = (props) => {
         console.log(tid)
         let data = []
         async function generateData() {
-            for(let i=0;i<100;i+=10){
-                for(let j=0;j<100;j+=20){
+            for(let j=0;j<100;j+=25){
+                for(let i=90;i>=0;i-=10){
                     //query data from db for results
                     const resultArr = await db.execute("select sum(rightClick) as rightCount, avg(timeTaken) as timeTaken from tapResult where tid = ? and xPos = ? and yPos = ?", [tid.params.tid, j, i])
-                    let clr = resultArr.rows[0].rightCount == 2 ? "green" : resultArr.rows[0].rightCount == 1 ? "orange" : "red"
+                    let clr = resultArr.rows[0].rightCount == 1 ? "green" : resultArr.rows[0].rightCount == 0 ? "red" : "red"
                     data.push({bottom: String(i) + "%", right: String(j) + "%", backgroundColor: clr, timeTaken: resultArr.rows[0].timeTaken.toFixed(2)})
                 }
             }
@@ -111,7 +111,7 @@ export const TapResult = (props) => {
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-        width: Dimensions.get('window').width * 0.2,
+        width: Dimensions.get('window').width * 0.25,
         height: Dimensions.get('window').height * 0.1,
     },
     legendButton: {

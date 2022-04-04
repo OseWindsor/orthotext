@@ -41,7 +41,7 @@ export const SwipeCanvas = (props) => {
 
       //function to write testid data to db
       async function writeData() {
-        const res1 = await db.execute("insert into summary (device, testProduct, testStatus, testType, pid, posture,testHand) values (?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"swiping",pid,posture,testHand])
+        const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture,testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"swiping",pid,posture,testHand])
         tid = res1.insertId
         //console.log(res1)
       }
@@ -89,7 +89,7 @@ export const SwipeCanvas = (props) => {
       });
       //ref.current.clearSignature()
       console.log(trialCount)
-      if(trialCount==9){
+      if(trialCount==2){
         await db.execute("update summary set testStatus = ? where id = ?", [true, tid])
         navigation.dispatch(
           CommonActions.reset({
@@ -160,7 +160,7 @@ export const SwipeCanvas = (props) => {
 
       <View style = {{...styles.container}}>
       <View pointerEvents={trialState==true?"auto":"none"} style = {{...styles.container, alignItems: "center", justifyContent: "flex-end"}}>
-      <Text style={{position:"absolute", marginTop: "5%", zIndex: 30, fontSize: 25}}>Trial {trialCount+1<10?trialCount+1:10} of 10</Text>
+      <Text style={{position:"absolute", marginTop: "5%", zIndex: 30, fontSize: 25}}>Trial {trialCount+1<3?trialCount+1:3} of 3</Text>
       <SignatureScreen
         ref={ref}
         onOK = {handleOK}
@@ -178,7 +178,7 @@ export const SwipeCanvas = (props) => {
       </View>
       <View style={(trialState)?{...styles.viewDisabled}:{...styles.viewEnabled}}>
         <TouchableOpacity disabled = {trialState==false?false:true} style={(trialState)?{...styles.disabledNextButton}:{...styles.nextButton}} onPress={handleNext}>
-          <Text>{trialState==false && trialCount < 9 ?'Next trial':'Swipe'}</Text>
+          <Text>{trialState==false && trialCount < 2 ?'Next trial':'Swipe'}</Text>
         </TouchableOpacity>
         {trialState==false &&
         <TouchableOpacity style={(trialState)?{...styles.disabledNextButton}:{...styles.nextButton}} onPress={createTwoButtonAlert}>
