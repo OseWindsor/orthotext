@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions,StatusBar  } from 'react-native';
 import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
+import { Orientation } from 'expo-orientation-sensor'
 import {Database} from "../Database"
 
 const db = new Database("result.db");
@@ -9,8 +10,15 @@ let timer
 
 export const ExpButton = (props) => {
     const navigation = useNavigation();
+    const [testID, setTestID] = useState(0)
+    const [time, setTime] = React.useState(0);
     const route = useRoute();
     const [xPos, setXPos] = useState([])
+    const [angles, setAngles] = useState({
+        yaw: 0,
+        pitch: 0,
+        roll: 0,
+      })
     let prod = route.params.product
     let dev = route.params.device
     let pid = route.params.PID
@@ -32,6 +40,7 @@ export const ExpButton = (props) => {
             console.log(typeof prod)
             const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid, posture, testhand])
             tid = res1.insertId
+            setTestID(tid)
             console.log(res1)
         }
         writeData()
@@ -43,17 +52,48 @@ export const ExpButton = (props) => {
                 data.push({bottom: String(i) + "%", right: String(j) + "%"})
             }
         }
-        console.log(data)
+        //console.log(data)
         return setXPos([...data]);
     },[])
 
     //cleanup to clear timeouts on component unmount
     useEffect(() => {
+        const subscriber = Orientation.addListener(angleData => {
+            setAngles(angleData)
+          })
         return () => {
             StatusBar.setHidden(false,'slide')
             clearTimeout(timer);
+            subscriber.remove()
           };
     },[])
+
+    //one second clock tick
+    useEffect(() => {
+        const interval = setInterval(() => {
+        if(testID>0){
+            setTime(prevTime => prevTime + 1);
+        } 
+        }, 500);
+        return () => clearInterval(interval);
+    }, [testID]);
+
+    async function writeAngles(testid,roll,pitch,yaw){
+        const res1 = await db.execute("insert into deviceAngles (tid,pitch,roll,yaw) values (?,?,?,?)", [testid,pitch,roll,yaw])
+        const res2 = await db.execute("select * from deviceAngles where tid = ?", [testid])
+        console.log(res2.rows)
+    }
+
+    useEffect(() => {
+        if(time==1){
+            Orientation.setUpdateInterval(200)
+        }
+        let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+        let roll = ((((angles.roll*180)/Math.PI)+180).toFixed(0))
+        let yaw = ((((angles.yaw*180)/Math.PI)+180).toFixed(0))
+        writeAngles(testID,roll,pitch,yaw)
+    }, [time]);
+
 
     const [position, setPosition] = useState(0)
     const [startTime, setStartTime] = useState(new Date() * 1)
@@ -66,13 +106,13 @@ export const ExpButton = (props) => {
             console.log(parseFloat(xPos[position].right))
             if(parseFloat(xPos[position].right)>45){
                 tapZone = 1
-                console.log("zone 1")
+                //console.log("zone 1")
             }else{
                 tapZone = 2
-                console.log("zone 2")
+                //console.log("zone 2")
             }
         }else{
-            console.log(parseFloat(xPos[position].right))
+            //console.log(parseFloat(xPos[position].right))
             if(parseFloat(xPos[position].right)<45){
                 tapZone = 1
                 console.log("zone 1")

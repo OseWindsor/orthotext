@@ -17,6 +17,7 @@
     "expo-device": "~3.2.0",
     "expo-file-system": "~11.0.2",
     "expo-gl": "~10.2.0",
+    "expo-orientation-sensor": "^2.0.3",
     "expo-pixi": "^1.2.0",
     "expo-sharing": "~9.1.2",
     "expo-sqlite": "~9.1.0",

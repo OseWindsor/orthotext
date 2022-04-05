@@ -291,6 +291,9 @@ export default function App() {
       tx.executeSql(
         "create table if not exists participants (id integer primary key not null, firstName text, lastName text, handSize text);"
       );
+      tx.executeSql(
+        "create table if not exists deviceAngles (id integer primary key not null, tid integer, pitch real, roll real, yaw real);"
+      );
     });
   }, []);
   return (
