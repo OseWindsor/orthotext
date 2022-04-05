@@ -4,6 +4,7 @@ import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@re
 import RNSwipeVerify from '../swipeVerify'
 import {Database} from "../../Database.js"
 import { LogBox } from 'react-native';
+import { Orientation } from 'expo-orientation-sensor'
 import { positionsData } from './positions';
 
 const db = new Database("result.db");
@@ -20,6 +21,13 @@ export const ExpScroll = (props) => {
     const posi = JSON.parse(JSON.stringify(positionsData));
     const swipeComp = useRef(null)
     const [upd, setUpd] = useState(0)
+    const [testID, setTestID] = useState(0)
+    const [time, setTime] = React.useState(0);
+    const [angles, setAngles] = useState({
+      yaw: 0,
+      pitch: 0,
+      roll: 0,
+    })
     const [startTime, setStartTime] = useState(new Date() * 1)
     const [trials, setTrials] = useState(0)
     const [scrollWidth,setScrollWidth] = useState(Dimensions.get('window').height/2)
@@ -42,6 +50,7 @@ export const ExpScroll = (props) => {
         async function writeData() {
             const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"scrolling",pid,posture,testHand])
             tid = res1.insertId
+            setTestID(tid)
         }
         writeData()
         console.log(pid)
@@ -70,6 +79,47 @@ export const ExpScroll = (props) => {
             clearInterval(interval)
             };
     },[])
+
+    //subscribe to device angles
+    useEffect(() => {
+        const subscriber = Orientation.addListener(angleData => {
+            setAngles(angleData)
+        })
+        return () => {
+            subscriber.remove()
+        };
+    },[])
+
+    //one second clock tick
+    useEffect(() => {
+        const tickInterval = setInterval(() => {
+        if(testID>0){
+            setTime(prevTime => prevTime + 1);
+        } 
+        }, 500);
+        return () => clearInterval(tickInterval);
+    }, [testID]);
+
+    //function to write angles data to db
+    async function writeAngles(testid,roll,pitch,yaw){
+        const res1 = await db.execute("insert into deviceAngles (tid,pitch,roll,yaw) values (?,?,?,?)", [testid,pitch,roll,yaw])
+        const res2 = await db.execute("select * from deviceAngles where tid = ?", [testid])
+        console.log(res2.rows[res2.rows.length-1])
+    }
+
+    //initiate angleswrite function on tick
+    useEffect(() => {
+        if(time==1){
+            Orientation.setUpdateInterval(200)
+        }
+        let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+        let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
+        let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
+        if(testID>0){
+            writeAngles(testID,roll,pitch,yaw)
+        }
+    }, [time]);
+
 
     //function to execute on successful scroll
     async function handleVerify(clickResult){

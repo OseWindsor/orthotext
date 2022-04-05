@@ -271,7 +271,7 @@ export default function App() {
       //   "drop table if exists scrollResult"
       // );
       // tx.executeSql(
-      //   "drop table if exists participants"
+      //   "drop table if exists deviceAngles"
       // );
       tx.executeSql(
         "create table if not exists summary (id integer primary key not null, device text, testDate text, testType text, testProduct text, testMode text, testStatus boolean, pid integer, posture text, testHand text);"

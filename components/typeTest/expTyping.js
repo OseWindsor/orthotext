@@ -3,6 +3,7 @@ import {SafeAreaView, StyleSheet, TextInput, View, Text } from "react-native";
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import {sampleSentences} from './sentences'
 import {Database} from "../../Database.js"
+import { Orientation } from 'expo-orientation-sensor'
 let wrongIndexes
 let accurateStrokes, inaccurateStrokes, startTime, completedIndex, accuracyIndex, wordLength, wordMistakes, nextWordLength, arr, trialCount, rawwpm
 const db = new Database("result.db");
@@ -23,6 +24,13 @@ export const ExpType = (props) => {
   const [typingAccuracy, setAccuracy] = React.useState(0)
   const [wordspm, setWPM] = React.useState(0)
   const [rawwordsPM, setrawWPM] = React.useState(0)
+  const [testID, setTestID] = React.useState(0)
+  const [time, setTime] = React.useState(0);
+  const [angles, setAngles] = React.useState({
+    yaw: 0,
+    pitch: 0,
+    roll: 0,
+  })
   let clr = charColor
   let chrs = chars
   const inputBox = React.useRef();
@@ -40,7 +48,7 @@ export const ExpType = (props) => {
     if(timeElapsed!=0){
       let rec = await db.execute("insert into typeResult (tid,trialNumber,wpm,accuracy,timeElapsed) values (?,?,?,?,?)",[tid,trialCount,wordspm,typingAccuracy,timeElapsed])
       let result = await db.execute("select timeElapsed, accuracy, trialNumber from typeResult where tid = ?",[tid])
-      console.log(result.rows)
+      //console.log(result.rows)
     }
   }
 
@@ -68,7 +76,7 @@ export const ExpType = (props) => {
     async function writeData() {
       const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, testMode, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?, ?)", [dev,prod,false,"typing",testType,pid,posture,testHand])
       tid = res1.insertId
-      console.log(await db.execute("select * from summary where id = ?",[tid]))
+      setTestID(tid)
     }
     writeData()
     trialCount = 0
@@ -135,6 +143,46 @@ export const ExpType = (props) => {
     //console.log(timerTick)
     recordData()
   },[timerTick])
+
+  //subscribe to device angles
+  React.useEffect(() => {
+    const subscriber = Orientation.addListener(angleData => {
+        setAngles(angleData)
+      })
+    return () => {
+        subscriber.remove()
+      };
+  },[])
+
+  //one second clock tick
+  React.useEffect(() => {
+      const tickInterval = setInterval(() => {
+      if(testID>0){
+          setTime(prevTime => prevTime + 1);
+      } 
+      }, 500);
+      return () => clearInterval(tickInterval);
+  }, [testID]);
+
+  //function to write angles data to db
+  async function writeAngles(testid,roll,pitch,yaw){
+      const res1 = await db.execute("insert into deviceAngles (tid,pitch,roll,yaw) values (?,?,?,?)", [testid,pitch,roll,yaw])
+      const res2 = await db.execute("select * from deviceAngles where tid = ?", [testid])
+      console.log(res2.rows[res2.rows.length-1])
+  }
+
+  //initiate angleswrite function on tick
+  React.useEffect(() => {
+      if(time==1){
+          Orientation.setUpdateInterval(200)
+      }
+      let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+      let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
+      let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
+      if(testID>0){
+          writeAngles(testID,roll,pitch,yaw)
+      }
+  }, [time]);
 
 
   const pressTrigger = (text) =>{

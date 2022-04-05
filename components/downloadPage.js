@@ -79,7 +79,7 @@ export const downloadPage = (props) => {
         let res = await db.execute('select id, testDate as Test_Date, testType as Test_Name, testStatus as Test_Status, testProduct as Product_Tested,pid as Participant_id,device as Device,testMode as Type_Test_Mode, posture as Posture, testhand as Test_Hand from summary')
         if(res.rows.length>0){
             const csv = json2csvParser.parse(res.rows);
-            let filename = 'summary.csv'; // or some other way to generate filename
+            let filename = 'summary.csv'; 
             let filepath = `${FileSystem.documentDirectory}/${filename}`;
             await FileSystem.writeAsStringAsync(filepath, csv);
             //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
@@ -110,6 +110,45 @@ export const downloadPage = (props) => {
         }
 
     }
+
+
+    async function downloadAngles(){
+        const json2csvParser = new Parser();
+        let res = await db.execute('select l.id, l.tid as testID, l.pitch, l.roll, l.yaw from deviceAngles l inner join summary r on r.id=l.tid where r.teststatus = 1')
+        if(res.rows.length>0){
+            const csv = json2csvParser.parse(res.rows);
+            let filename = 'angles.csv'; 
+            let filepath = `${FileSystem.documentDirectory}/${filename}`;
+            await FileSystem.writeAsStringAsync(filepath, csv);
+            //result = await Sharing.shareAsync(filepath, { mimeType: 'text/csv' })
+            try {
+                const result = await Share.share({
+                url:filepath
+                });
+                if (result.action === Share.sharedAction) {
+                if (result.activityType == 'com.apple.DocumentManagerUICore.SaveToFiles') {
+                    Alert.alert("File saved to device")
+                } else {
+                    Alert.alert("File Shared")
+                }
+                } else if (result.action === Share.dismissedAction) {
+                    Alert.alert("Download dismissed")
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }else{
+            Alert.alert('No data!', 'No data available yet for download. Complete a test and check back', [
+                {
+                  text: 'OK',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                }
+              ]);
+        }
+
+    }
+
 
     async function populateTestDrop(){
         let drop1 = []
@@ -228,7 +267,7 @@ export const downloadPage = (props) => {
 
 
     return (
-        <View style={{flex:1 ,flexDirection:"column", justifyContent:"flex-start", paddingTop:50,alignItems:"center"}}>
+        <View style={{flex:1 ,flexDirection:"row", justifyContent:"center", paddingTop:50,alignItems:"center", flexWrap:"wrap", alignContent:"center",backgroundColor:"#fff"}}>
             <Text style={{textAlign:"center", fontSize:23, fontWeight:"normal"}}>Select data to download</Text>
             <TouchableOpacity style={{...styles.welcomeButton, marginTop:30}} onPress={toggleModal}>
                 <Text style={{textAlign:"center", fontSize:23, fontWeight:"normal"}}>Test Result Data</Text>
@@ -238,6 +277,9 @@ export const downloadPage = (props) => {
             </TouchableOpacity>
             <TouchableOpacity style={{...styles.welcomeButton}} onPress={downloadParticipant}>
                 <Text style={{textAlign:"center", fontSize:23, fontWeight:"normal"}}>Participant Data</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{...styles.welcomeButton}} onPress={downloadAngles}>
+                <Text style={{textAlign:"center", fontSize:23, fontWeight:"normal"}}>Angles Data</Text>
             </TouchableOpacity>
             <Modal isVisible={isModalVisible} hideModalContentWhileAnimating={true} useNativeDriver={true} animationIn="slideInDown" backdropTransitionInTiming={0} backdropColor="white" backdropOpacity={1}>
                 <SafeAreaView style={{flex:1, alignItems:"center", justifyContent:"flex-start", marginTop:70}}>
@@ -297,14 +339,16 @@ const styles = StyleSheet.create({
     welcomeButton: {
       margin: 10,
       elevation: 10,
-      borderWidth: 1.5,
       justifyContent: "center",
       width: 150,
-      height:150,
-      backgroundColor: "#EDEDED",
-      borderColor:"#3C415C",
+      height:100,
+      backgroundColor: "#fff",
       padding: 20,
       borderRadius: 30,
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowOffset: { width: 0, height: 1 },
+      shadowRadius: 5,  
     },
     homeContainer: {
       flex: 1,

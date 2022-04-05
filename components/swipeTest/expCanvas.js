@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, TouchableOpacity, Button, Alert, View, Image, Text, StatusBar, TouchableHighlight } from 'react-native';
 import { useNavigation, useRoute, CommonActions, NavigationContainer } from '@react-navigation/native';
 import {Database} from "../../Database.js"
+import { Orientation } from 'expo-orientation-sensor'
 import SignatureScreen from "react-native-signature-canvas";
 
 const db = new Database("result.db");
@@ -14,6 +15,13 @@ export const SwipeCanvas = (props) => {
     //initializing refs and states
     const ref = useRef();
     const route = useRoute();
+    const [testID, setTestID] = useState(0)
+    const [time, setTime] = React.useState(0);
+    const [angles, setAngles] = useState({
+      yaw: 0,
+      pitch: 0,
+      roll: 0,
+    })
     const navigation = useNavigation();
     const [trialCount, setTrialCount] = useState(0)
     const [trialState, setTrialState] = useState(true)
@@ -43,6 +51,7 @@ export const SwipeCanvas = (props) => {
       async function writeData() {
         const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture,testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"swiping",pid,posture,testHand])
         tid = res1.insertId
+        setTestID(tid)
         //console.log(res1)
       }
       writeData()
@@ -53,6 +62,7 @@ export const SwipeCanvas = (props) => {
       };
     },[])
 
+    //function for quit alert
     const createTwoButtonAlert = () =>
     Alert.alert(
       "Quit Test",
@@ -74,6 +84,46 @@ export const SwipeCanvas = (props) => {
       ref.current.clearSignature()
       setTrialState(true)
     }
+
+  //subscribe to device angles
+  useEffect(() => {
+    const subscriber = Orientation.addListener(angleData => {
+        setAngles(angleData)
+      })
+    return () => {
+        subscriber.remove()
+      };
+  },[])
+
+  //one second clock tick
+  useEffect(() => {
+      const tickInterval = setInterval(() => {
+      if(testID>0){
+          setTime(prevTime => prevTime + 1);
+      } 
+      }, 500);
+      return () => clearInterval(tickInterval);
+  }, [testID]);
+
+  //function to write angles data to db
+  async function writeAngles(testid,roll,pitch,yaw){
+      const res1 = await db.execute("insert into deviceAngles (tid,pitch,roll,yaw) values (?,?,?,?)", [testid,pitch,roll,yaw])
+      const res2 = await db.execute("select * from deviceAngles where tid = ?", [testid])
+      console.log(res2.rows[res2.rows.length-1])
+  }
+
+  //initiate angleswrite function on tick
+  useEffect(() => {
+      if(time==1){
+          Orientation.setUpdateInterval(200)
+      }
+      let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+      let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
+      let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
+      if(testID>0){
+          writeAngles(testID,roll,pitch,yaw)
+      }
+  }, [time]);
 
     // Called after ref.current.readSignature() reads a non-empty base64 string
     async function handleOK(signature){

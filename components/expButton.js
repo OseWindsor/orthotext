@@ -78,20 +78,24 @@ export const ExpButton = (props) => {
         return () => clearInterval(interval);
     }, [testID]);
 
+    //function to write angles data to db
     async function writeAngles(testid,roll,pitch,yaw){
         const res1 = await db.execute("insert into deviceAngles (tid,pitch,roll,yaw) values (?,?,?,?)", [testid,pitch,roll,yaw])
         const res2 = await db.execute("select * from deviceAngles where tid = ?", [testid])
-        console.log(res2.rows)
+        console.log(res2.rows[res2.rows.length-1])
     }
 
+    //initiate angleswrite function on tick
     useEffect(() => {
         if(time==1){
             Orientation.setUpdateInterval(200)
         }
         let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
-        let roll = ((((angles.roll*180)/Math.PI)+180).toFixed(0))
-        let yaw = ((((angles.yaw*180)/Math.PI)+180).toFixed(0))
-        writeAngles(testID,roll,pitch,yaw)
+        let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
+        let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
+        if(testID>0){
+            writeAngles(testID,roll,pitch,yaw)
+        }
     }, [time]);
 
 
