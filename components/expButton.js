@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions,StatusBar  } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Button, TouchableWithoutFeedback, Dimensions,StatusBar,Alert  } from 'react-native';
 import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import { Orientation } from 'expo-orientation-sensor'
 import {Database} from "../Database"
@@ -7,6 +7,7 @@ import {Database} from "../Database"
 const db = new Database("result.db");
 let tid = 0;
 let timer
+let interval
 
 export const ExpButton = (props) => {
     const navigation = useNavigation();
@@ -37,7 +38,7 @@ export const ExpButton = (props) => {
         let data = []
         //function to write testid data to db
         async function writeData() {
-            console.log(typeof prod)
+            //console.log(typeof prod)
             const res1 = await db.execute("insert into summary (device, testDate, testProduct, testStatus, testType, pid, posture, testHand) values (?, DateTime('now', 'localtime'), ?, ?, ?, ?, ?, ?)", [dev,prod,false,"tapping",pid, posture, testhand])
             tid = res1.insertId
             setTestID(tid)
@@ -70,7 +71,7 @@ export const ExpButton = (props) => {
 
     //one second clock tick
     useEffect(() => {
-        const interval = setInterval(() => {
+        interval = setInterval(() => {
         if(testID>0){
             setTime(prevTime => prevTime + 1);
         } 
@@ -91,10 +92,25 @@ export const ExpButton = (props) => {
             Orientation.setUpdateInterval(200)
         }
         let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+        if(pitch>180){
+            pitch = pitch - 360
+        }
         let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
         let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
         if(testID>0){
-            writeAngles(testID,roll,pitch,yaw)
+            if(Orientation.listenerCount>0){
+                writeAngles(testID,roll,pitch,yaw)
+            }
+            else{
+                clearInterval(interval)
+                Alert.alert(
+                    "No listerners",
+                    "No sensor listeners - Restart test to try again",
+                    [
+                      { text: "OK", onPress: navigation.goBack }
+                    ]
+                  );
+            }
         }
     }, [time]);
 

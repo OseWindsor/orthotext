@@ -15,6 +15,7 @@ export const typeResultPage = (props) => {
     const route = useRoute();
     const navigation = useNavigation();
     const [participant, setParticipant] = useState(null)
+    const [anglesState, setAngles] = useState({pitch:0,roll:0,maxPitch:0})
     const [tableHead, SetTableHead] = useState(["",'Words per minute', 'Accuracy'])
     const [tableData, setTableData] = useState([['50','50'],['50','50'],['50','50']])
     const [tableTitle, setTableTitle] = useState(['Trial 1','Trial 2', 'Trial 3'])
@@ -86,6 +87,8 @@ export const typeResultPage = (props) => {
             }
             let res1 = await db.execute("select firstName, lastName from participants where id = ?",[props.route.params.pid])
             setParticipant(res1.rows[0].firstName + " " + res1.rows[0].lastName)
+            let angles = await db.execute("select avg(pitch) as pitch, avg(roll) as roll, max(pitch) as maxPitch from deviceAngles where tid = ?", [props.route.params.tid])
+            setAngles(angles.rows[0])
             console.log(col1)
             setTableData(col1)
         }
@@ -108,7 +111,7 @@ export const typeResultPage = (props) => {
                         </Table>
                     </View>
                     {/* info cards */}
-                    <View style={{flexDirection:"row", justifyContent:"space-evenly",flexWrap:"wrap", marginBottom:90}}>
+                    <View style={{flexDirection:"row", justifyContent:"space-evenly",flexWrap:"wrap"}}>
                         <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
                             <Text style = {{color:'white'}}>Test ID</Text>
                             <View style={{flexGrow:1, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
@@ -143,6 +146,26 @@ export const typeResultPage = (props) => {
                             <Text style = {{color:'white'}}>Test Hand</Text>
                             <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
                                 <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.testHand}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{flexDirection:"row", justifyContent:"space-around",flexWrap:"wrap", borderWidth:0, width:"100%", marginBottom:90}}>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Avg Pitch</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.pitch.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Avg Roll</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.roll.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Max Pitch</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.maxPitch.toFixed(2)}</Text>
                             </View>
                         </View>
                     </View>

@@ -15,6 +15,7 @@ export const scrollResultPage = (props) => {
     const route = useRoute();
     const navigation = useNavigation();
     const [participant, setParticipant] = useState(null)
+    const [anglesState, setAngles] = useState({pitch:0,roll:0,maxPitch:0})
     const [tableHead, SetTableHead] = useState(["",'Avg Time Taken (s)', '1st Try Acc (%)'])
     const [tableData, setTableData] = useState([])
     const [tableTitle, setTableTitle] = useState(['0 deg','90 deg', '180 deg', '270 deg'])
@@ -84,6 +85,9 @@ export const scrollResultPage = (props) => {
             });
             let res1 = await db.execute("select firstName, lastName from participants where id = ?",[props.route.params.pid])
             console.log(props.route.params)
+            let angles = await db.execute("select avg(pitch) as pitch, avg(roll) as roll, max(pitch) as maxPitch from deviceAngles where tid = ?", [props.route.params.tid])
+            setAngles(angles.rows[0])
+            setAngles(angles.rows[0])
             setParticipant(res1.rows[0].firstName + " " + res1.rows[0].lastName)
             setTableData(col1)
         }
@@ -92,7 +96,7 @@ export const scrollResultPage = (props) => {
     return (
         <View style={{flexGrow:1}}>
             <View style={{flexGrow:1, minHeight:"100%"}}>
-                <ScrollView>
+                <ScrollView style={{...styles.container}}>
                     <View style={{margin: 7, alignItems: "center"}}>
                         <Text style = {{fontSize: 20, fontWeight: "100"}}>Summary Table</Text>
                     </View>
@@ -144,6 +148,28 @@ export const scrollResultPage = (props) => {
                                 <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.testHand}</Text>
                             </View>
                         </View>
+                    </View>
+                    <View style={{flexDirection:"row", justifyContent:"space-around",flexWrap:"wrap", borderWidth:0, width:"100%"}}>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Avg Pitch</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.pitch.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Avg Roll</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.roll.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                        <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                            <Text style = {{color:'white'}}>Max Pitch</Text>
+                            <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                                <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.maxPitch.toFixed(2)}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{alignItems: "center", margin: 15, marginBottom: 90, justifyContent:"space-evenly",flexDirection:"row"}}>
                     </View>
                 </ScrollView>
             </View>

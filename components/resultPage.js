@@ -14,6 +14,7 @@ const db = new Database("result.db");
 export const resultPage = (props) => {
     const route = useRoute();
     const navigation = useNavigation();
+    const [anglesState, setAngles] = useState({pitch:0,roll:0,maxPitch:0})
     const [tableHead, SetTableHead] = useState(["",'Zone1', 'Zone2', 'Overall'])
     const [tableData, setTableData] = useState([
         ['1', '2', '3'],
@@ -86,6 +87,8 @@ export const resultPage = (props) => {
             let rightCountZ2 = await db.execute("select count(rightClick) as rightCount from tapResult where tid = ? and rightClick = ? and tapZone = ?", [props.route.params.tid, 1, 2])
             let timeTakenZ2 = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ? and tapZone = ?", [props.route.params.tid, 2])
             let timeTakenOverall = await db.execute("select avg(timeTaken) as timeTaken from tapResult where tid = ?", [props.route.params.tid])
+            let angles = await db.execute("select avg(pitch) as pitch, avg(roll) as roll, max(pitch) as maxPitch from deviceAngles where tid = ?", [props.route.params.tid])
+            setAngles(angles.rows[0])
             let accZ1 = (((rightCountZ1.rows[0].rightCount)/20)*100).toFixed(2)
             let accZ2 = (((rightCountZ2.rows[0].rightCount)/20)*100).toFixed(2)
             let accOverall = (((rightCountZ2.rows[0].rightCount+rightCountZ1.rows[0].rightCount)/40)*100).toFixed(2)
@@ -120,6 +123,7 @@ export const resultPage = (props) => {
                 </Table>
             </View>
             {/* info cards */}
+            
             <View style={{flexDirection:"row", justifyContent:"space-evenly",flexWrap:"wrap"}}>
                 <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
                     <Text style = {{color:'white'}}>Test ID</Text>
@@ -155,6 +159,26 @@ export const resultPage = (props) => {
                     <Text style = {{color:'white'}}>Test Hand</Text>
                     <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
                         <Text style = {{fontWeight:'normal',textAlign:"center"}}>{props.route.params.testhand}</Text>
+                    </View>
+                </View>
+            </View>
+            <View style={{flexDirection:"row", justifyContent:"space-around",flexWrap:"wrap", borderWidth:0, width:"100%"}}>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Avg Pitch</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.pitch.toFixed(2)}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Avg Roll</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.roll.toFixed(2)}</Text>
+                    </View>
+                </View>
+                <View style ={{width:"30%", marginTop: 7, borderWidth: 0, borderRadius: 10,...styles.shadowStyle, paddingTop:5,alignItems:"center", justifyContent:"flex-start",backgroundColor:"#064663"}}>
+                    <Text style = {{color:'white'}}>Max Pitch</Text>
+                    <View style={{flexGrow:1, paddingVertical:15, borderWidth:0,width:"100%",borderRadius:10,alignItems:"center",justifyContent:"center",backgroundColor:"white"}}>
+                        <Text style = {{fontWeight:'normal',textAlign:"center"}}>{anglesState.maxPitch.toFixed(2)}</Text>
                     </View>
                 </View>
             </View>

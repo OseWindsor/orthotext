@@ -11,6 +11,7 @@ const db = new Database("result.db");
 let tid = 0;
 var timer
 var interval
+let tickInterval
 const { width } = Dimensions.get('window')
 //ignore nativeDriver warning logs
 LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
@@ -92,7 +93,7 @@ export const ExpScroll = (props) => {
 
     //one second clock tick
     useEffect(() => {
-        const tickInterval = setInterval(() => {
+        tickInterval = setInterval(() => {
         if(testID>0){
             setTime(prevTime => prevTime + 1);
         } 
@@ -113,10 +114,25 @@ export const ExpScroll = (props) => {
             Orientation.setUpdateInterval(200)
         }
         let pitch = ((((angles.pitch*180)/Math.PI)+180).toFixed(0))
+        if(pitch>180){
+            pitch = pitch - 360
+        }
         let roll = ((((angles.roll*180)/Math.PI)).toFixed(0))
         let yaw = ((((angles.yaw*180)/Math.PI)).toFixed(0))
         if(testID>0){
-            writeAngles(testID,roll,pitch,yaw)
+            if(Orientation.listenerCount>0){
+              writeAngles(testID,roll,pitch,yaw)
+            }
+            else{
+                clearInterval(interval)
+                Alert.alert(
+                    "No listerners",
+                    "No sensor listeners - Restart test to try again",
+                    [
+                      { text: "OK", onPress: navigation.goBack }
+                    ]
+                  );
+            }
         }
     }, [time]);
 
